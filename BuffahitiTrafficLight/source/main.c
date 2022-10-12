@@ -29,9 +29,12 @@
  */
 
 /**
- * @file    BuffahitiTrafficLight.c
- * @brief   Application entry point.
+ * \file    main.c
+ * \author	Dayton Flores (dafl2542@colorado.edu)
+ * \date	10/14/2022
+ * \brief   Application entry point
  */
+
 #include <stdio.h>
 #include "board.h"
 #include "peripherals.h"
@@ -40,7 +43,10 @@
 #include "MKL25Z4.h"
 #include "fsl_debug_console.h"
 /* TODO: insert other include files here. */
-
+#include "bitops.h"
+#include "led.h"
+#include "timer.h"
+#include "touch.h"
 /* TODO: insert other definitions and declarations here. */
 
 /*
@@ -57,13 +63,23 @@ int main(void) {
     BOARD_InitDebugConsole();
 #endif
 
-    PRINTF("Hello World\n");
+    /**
+     * Initialize all 3 on-board LEDs (red, green, blue)
+     */
+    init_onboard_leds();
 
-    /* Force the counter to be placed into memory. */
-    volatile static int i = 0 ;
+    /**
+     * Initialize on-board touch sensor
+     */
+    init_onboard_touch_sensor();
+
+    /**
+     * Initialize SysTick on-board timer
+     */
+    init_systick();
+
     /* Enter an infinite loop, just incrementing a counter. */
     while(1) {
-        i++ ;
         /* 'Dummy' NOP to allow source level single stepping of
             tight while() loop */
         __asm volatile ("nop");
