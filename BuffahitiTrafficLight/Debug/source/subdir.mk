@@ -4,28 +4,34 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../source/fsm_trafficlight.c \
 ../source/led.c \
 ../source/main.c \
 ../source/mtb.c \
 ../source/semihost_hardfault.c \
-../source/timer.c \
-../source/touch.c 
+../source/systick.c \
+../source/touch.c \
+../source/tpm.c 
 
 C_DEPS += \
+./source/fsm_trafficlight.d \
 ./source/led.d \
 ./source/main.d \
 ./source/mtb.d \
 ./source/semihost_hardfault.d \
-./source/timer.d \
-./source/touch.d 
+./source/systick.d \
+./source/touch.d \
+./source/tpm.d 
 
 OBJS += \
+./source/fsm_trafficlight.o \
 ./source/led.o \
 ./source/main.o \
 ./source/mtb.o \
 ./source/semihost_hardfault.o \
-./source/timer.o \
-./source/touch.o 
+./source/systick.o \
+./source/touch.o \
+./source/tpm.o 
 
 
 # Each subdirectory must supply rules for building sources it contributes
@@ -40,7 +46,7 @@ source/%.o: ../source/%.c source/subdir.mk
 clean: clean-source
 
 clean-source:
-	-$(RM) ./source/led.d ./source/led.o ./source/main.d ./source/main.o ./source/mtb.d ./source/mtb.o ./source/semihost_hardfault.d ./source/semihost_hardfault.o ./source/timer.d ./source/timer.o ./source/touch.d ./source/touch.o
+	-$(RM) ./source/fsm_trafficlight.d ./source/fsm_trafficlight.o ./source/led.d ./source/led.o ./source/main.d ./source/main.o ./source/mtb.d ./source/mtb.o ./source/semihost_hardfault.d ./source/semihost_hardfault.o ./source/systick.d ./source/systick.o ./source/touch.d ./source/touch.o ./source/tpm.d ./source/tpm.o
 
 .PHONY: clean-source
 

@@ -8,7 +8,9 @@
 #include "board.h"
 
 #include "bitops.h"
+#include "fsm_trafficlight.h"
 #include "led.h"
+#include "systick.h"
 
 void init_onboard_leds(void)
 {
@@ -46,4 +48,26 @@ void init_onboard_leds(void)
     RED_LED_OFF();
     GREEN_LED_OFF();
     BLUE_LED_OFF();
+}
+
+void set_onboard_leds(void)
+{
+	switch(current.mode){
+	case STOP:
+		RED_LED_ON();
+		GREEN_LED_OFF();
+		BLUE_LED_OFF();
+		break;
+	case GO:
+		RED_LED_OFF();
+		GREEN_LED_ON();
+		BLUE_LED_OFF();
+		break;
+	case WARNING:
+		RED_LED_ON();
+		GREEN_LED_ON();
+		BLUE_LED_OFF();
+	case CROSSWALK:
+		break;
+	}
 }

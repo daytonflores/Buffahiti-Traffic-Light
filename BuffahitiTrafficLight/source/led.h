@@ -144,4 +144,12 @@
  */
 void init_onboard_leds(void);
 
+/**
+ * \fn		void set_onboard_leds
+ * \param	N/A
+ * \return	N/A
+ * \brief   Set on-board LEDs based on current state
+ */
+void set_onboard_leds(void);
+
 #endif /* LED_H_ */

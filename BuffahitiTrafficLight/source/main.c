@@ -42,17 +42,93 @@
 #include "clock_config.h"
 #include "MKL25Z4.h"
 #include "fsl_debug_console.h"
+
 /* TODO: insert other include files here. */
 #include "bitops.h"
+#include "fsm_trafficlight.h"
 #include "led.h"
-#include "timer.h"
+#include "systick.h"
 #include "touch.h"
+
 /* TODO: insert other definitions and declarations here. */
 
 /*
  * @brief   Application entry point.
  */
-int main(void) {
+
+#ifdef DEBUG
+int main(void)
+{
+
+    /* Init board hardware. */
+    BOARD_InitBootPins();
+    BOARD_InitBootClocks();
+    BOARD_InitBootPeripherals();
+#ifndef BOARD_INIT_DEBUG_CONSOLE_PERIPHERAL
+    /* Init FSL debug console. */
+    BOARD_InitDebugConsole();
+#endif
+
+    /**
+     * Initialize all 3 on-board LEDs (red, green, blue)
+     */
+    init_onboard_leds();
+
+    /**
+     * Initialize on-board touch sensor
+     */
+    init_onboard_touch_sensor();
+
+    /**
+     * Initialize the global current and next states
+     */
+    init_fsm_trafficlight();
+
+    /**
+     * Initialize SysTick on-board timer
+     */
+    init_onboard_systick();
+
+    /**
+     * Modify SysTick->CTRL register to enable the counter
+     */
+	ENABLE_SYSTICK_COUNTER();
+
+	PRINTF("%06u ms: Entering main loop...\r\n", now());
+
+    while(1) {
+
+        /**
+         * Set by SysTick_Handler
+         */
+        if(transitioning){
+
+            /**
+             * Modify SysTick->CTRL register to disable the counter
+             */
+        	DISABLE_SYSTICK_COUNTER();
+
+            /**
+             * Set current state to next state, and set next state appropriately
+             */
+        	transition_state();
+
+            /**
+             * Turn on appropriate on-board LEDs based on current state
+             */
+        	set_onboard_leds();
+
+            /**
+             * Modify SysTick->CTRL register to enable the counter
+             */
+        	ENABLE_SYSTICK_COUNTER();
+        }
+    }
+    return 0;
+}
+#elif NDEBUG
+int main(void)
+{
 
     /* Init board hardware. */
     BOARD_InitBootPins();
@@ -76,13 +152,50 @@ int main(void) {
     /**
      * Initialize SysTick on-board timer
      */
-    init_systick();
+    init_onboard_systick();
 
-    /* Enter an infinite loop, just incrementing a counter. */
+    /**
+     * Initialize the global current and next states
+     */
+    init_fsm_trafficlight();
+
+    ALT_CLOCK_LOAD(SEC_PER_STOP);
+	ENABLE_SYSTICK_COUNTER();
+	RED_LED_ON();
+	GREEN_LED_OFF();
+	BLUE_LED_OFF();
+
     while(1) {
-        /* 'Dummy' NOP to allow source level single stepping of
-            tight while() loop */
-        __asm volatile ("nop");
+        if(transitioning){
+        	transition_state();
+
+        	DISABLE_SYSTICK_COUNTER();
+
+        	switch(current.mode){
+        	case STOP:
+        		ALT_CLOCK_LOAD(SEC_PER_STOP);
+        		RED_LED_ON();
+        		GREEN_LED_OFF();
+        		BLUE_LED_OFF();
+        		break;
+        	case GO:
+        		ALT_CLOCK_LOAD(SEC_PER_GO);
+        		RED_LED_OFF();
+        		GREEN_LED_ON();
+        		BLUE_LED_OFF();
+        		break;
+        	case WARNING:
+        		ALT_CLOCK_LOAD(SEC_PER_WARNING);
+        		RED_LED_ON();
+        		GREEN_LED_ON();
+        		BLUE_LED_OFF();
+        	case CROSSWALK:
+        		break;
+        	}
+
+        	ENABLE_SYSTICK_COUNTER();
+        }
     }
-    return 0 ;
+    return 0;
 }
+#endif
