@@ -6,8 +6,8 @@
  */
 
 #include <stdint.h>
-
 #include "board.h"
+#include "fsl_debug_console.h"
 
 #include "touch.h"
 
@@ -27,6 +27,7 @@ void init_onboard_touch_sensor(void)
 	 * 	- Frequency clock divided by 1
 	 * 	- Scan electrode 32 times
 	 * 	- Enable the TSI module
+	 * 	- Enable the TSI interrupt
 	 * 	- Write 1 to clear the end of scan flag
 	 */
 	TSI0->GENCS = \
@@ -37,7 +38,19 @@ void init_onboard_touch_sensor(void)
 			TSI_GENCS_PS(GENCS_PS) |\
 			TSI_GENCS_NSCN(GENCS_NSCN) |\
 			TSI_GENCS_TSIEN_MASK |
+			TSI_GENCS_TSIIEN_MASK |
 			TSI_GENCS_EOSF_MASK;
+
+	TSI0->TSHD = \
+		(708 << 16);
+	/**
+     * Set the TSI interrupt priority (range 0 to 3, with 0 being highest priority)
+     */
+	NVIC_SetPriority(TSI0_IRQn, 1);
+	NVIC_ClearPendingIRQ(TSI0_IRQn);
+	NVIC_EnableIRQ(TSI0_IRQn);
+
+	PRINTF("TOUCH = %u\r\n", get_touch());
 }
 
 uint32_t get_touch(void)
@@ -66,4 +79,10 @@ uint32_t get_touch(void)
 	 * Now that scan has completed 32 times, return the raw data after subtracting TOUCH_OFFSET
 	 */
 	return (TOUCH_DATA - TOUCH_OFFSET);
+}
+
+void TSI0_IRQHandler(void)
+{
+	get_touch();
+	PRINTF("TOUCH\r\n");
 }

@@ -18,8 +18,7 @@
  * 			 ARM Cortex-M Based Microcontrollers: Embedded Systems)
  * 		011: Alternative (see Chapter 2 of Alexander G Dean's Embedded Systems Fundamentals with
  * 			 ARM Cortex-M Based Microcontrollers: Embedded Systems)
- * 		100: Alternative (see Chapter 2 of Alexander G Dean's Embedded Systems Fundamentals with
- * 			 ARM Cortex-M Based Microcontrollers: Embedded Systems)
+ * 		100: FTM0_CH1 (for TPM0 channel 1)
  * 		101: Alternative (see Chapter 2 of Alexander G Dean's Embedded Systems Fundamentals with
  * 			 ARM Cortex-M Based Microcontrollers: Embedded Systems)
  * 		110: Alternative (see Chapter 2 of Alexander G Dean's Embedded Systems Fundamentals with

@@ -57,6 +57,20 @@
 #define ALT_CLOCK_LOAD(x)\
 	SysTick->LOAD = ((ALT_CLOCK_HZ - 1) * x)
 
+/**
+ * \def		TICK_FREQ_HZ
+ * \brief	The frequency of SysTick interrupts in Hz
+ */
+#define TICK_FREQ_HZ\
+	(16)
+
+/**
+ * \def		TICK_PERIOD_S
+ * \brief	The amount of time between SysTick interrupts
+ */
+#define TICK_PERIOD_S\
+	(1.0/TICK_FREQ_HZ)
+
 #ifdef DEBUG
 /**
  * \def		SEC_PER_STOP

@@ -49,6 +49,7 @@
 #include "led.h"
 #include "systick.h"
 #include "touch.h"
+#include "tpm.h"
 
 /* TODO: insert other definitions and declarations here. */
 
@@ -61,6 +62,18 @@
  * \brief	The amount of times SysTick overflow has occurred
  */
 //volatile int i;
+
+/**
+ * \var		extern uint16_t pwm_period_hz;
+ * \brief	Declared in tpm.c
+ */
+extern uint16_t pwm_period;
+
+/**
+ * \var		extern volatile bool tick
+ * \brief	Declared in systick.c
+ */
+extern volatile bool tick;
 
 #ifdef DEBUG
 int main(void)
@@ -83,7 +96,7 @@ int main(void)
     /**
      * Initialize on-board touch sensor
      */
-    init_onboard_touch_sensor();
+    //init_onboard_touch_sensor();
 
     /**
      * Initialize the global current and next states
@@ -96,19 +109,38 @@ int main(void)
     init_onboard_systick();
 
     /**
+     * Initialize TPM on-board Timer PWM module
+     */
+    //init_onboard_tpm();
+
+    /**
      * Turn on appropriate on-board LEDs based on current state
      */
 	set_onboard_leds();
 
 	PRINTF("%07u ms: Entering main loop...\r\n", now());
 
+    //uint32_t i = 0;
+    //volatile int32_t delay;
+
     while(1) {
+
+    	//for(i = 0; i < pwm_period; i++){
+    	//	TPM0->CONTROLS[1].CnV = i;
+    	//	for(delay = 0; delay < 100; delay++);
+    	//}
+
+    	//for(i = pwm_period - 1; i > 0; i--){
+    	//	TPM0->CONTROLS[1].CnV = i;
+    	//	for(delay = 0; delay < 100; delay++);
+    	//}
 
         /**
          * Set by SysTick_Handler
          */
-        if(transitioning){
+        if(tick){
 
+        	PRINTF("TICK\r\n");
             /**
              * Set current state to next state, and set next state appropriately
              */

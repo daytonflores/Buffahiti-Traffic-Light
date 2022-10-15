@@ -9,28 +9,48 @@
 #define TPM_H_
 
 /**
- * \def		F_TPM_CLOCK
- * \brief
+ * \def		TPM_CLOCK_SRC
+ * \brief	Configuration for TPM clock source select
  * \detail
+ * 		0: Disabled
+ * 		1: MCGFLLCLK (or MCGPLLCLK / 2)
+ * 		2: OSCERCLK
+ * 		3: MCGIRCLK
  */
-#define F_TPM_CLOCK\
+#define TPM_CLOCK_SRC\
+	(1)
+
+/**
+ * \def		TPM_DBGMODE
+ * \brief	Configuration for TPM debug mode
+ * \detail
+ * 		0: LPTPM counter does not increment during debug. Trigger inputs and input capture events
+ * 		   are also ignored
+ * 		3: LPTPM counter continues to increment in debug mode
+ */
+#define TPM_DBGMODE\
+	(3)
+
+/**
+ * \def		PWM_FREQ_HZ
+ * \brief	The desired frequency of the PWM in Hz
+ */
+#define PWM_FREQ_HZ\
+	(16)
+
+/**
+ * \def		MAX_TPM_MOD_VALUE
+ * \brief	The max division factor for 16-bit TPM->MOD register
+ */
+#define MAX_TPM_MOD_VALUE\
+	(65536)
+
+/**
+ * \def		F_TPM_CLOCK_HZ
+ * \brief	The TPM input clock frequency in Hz
+ */
+#define F_TPM_CLOCK_HZ\
 	(48000000)
-
-/**
- * \def		F_TPM_OVFLW
- * \brief
- * \detail
- */
-#define F_TPM_OVFLW\
-	(100000)
-
-/**
- * \def		F_TPM_PRESCALER
- * \brief	Configuration for hardware circuit that divides down the input signal's frequency by some factor
- * \detail	Can be 1, 2, 4, 8, 16, 32, 64, 128
- */
-#define F_TPM_PRESCALER\
-	(32)
 
 /**
  * \def		STEP_SIZE
@@ -38,7 +58,7 @@
  * \detail	Keep in mind the DAC_RESOLUTION along with the TPM MOD value when configuring STEP_SIZE
  */
 #define STEP_SIZE\
-	(16)
+	(1)
 
 /**
  * \def		DAC_RESOLUTION

@@ -159,6 +159,14 @@ extern volatile state_t next;
 void init_fsm_trafficlight(void);
 
 /**
+ * \fn		void get_steps
+ * \param	N/A
+ * \return	N/A
+ * \brief   Get step sizes for RGB values when analyzing current state vs next state
+ */
+void get_steps(void);
+
+/**
  * \fn		void transition_state
  * \param	N/A
  * \return	N/A

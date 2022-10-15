@@ -20,9 +20,15 @@
 
 /**
  * \var		ticktime_t ticks_since_startup
- * \brief	Ticks since boot, where each tick is 1 ms
+ * \brief	Ticks since boot, where each tick is 62.5 ms
  */
 volatile ticktime_t ticks_since_startup = 0;
+
+/**
+ * \var		ticktime_t ticks_since_last
+ * \brief	Ticks since last tick
+ */
+volatile ticktime_t ticks_since_last = 0;
 
 /**
  * \var		extern volatile int i
@@ -36,13 +42,19 @@ volatile ticktime_t ticks_since_startup = 0;
  */
 extern uint32_t prev_alt_clock_load;
 
+/**
+ * \var		volatile bool tick
+ * \brief	Flag controlled by SysTick timer
+ */
+volatile bool tick = false;
+
 void init_onboard_systick()
 {
     /**
      * Configure the SysTick LOAD register:
      * 	- To the expected LOAD for initial STOP state
      */
-	ALT_CLOCK_LOAD(SEC_PER_GO);
+	ALT_CLOCK_LOAD(TICK_PERIOD_S);
 
 	/**
      * Set the SysTick interrupt priority (range 0 to 3, with 0 being highest priority)
@@ -73,12 +85,16 @@ void init_onboard_systick()
 void SysTick_Handler()
 {
 	//i++;
-	ticks_since_startup += prev_alt_clock_load;
-	transitioning = true;
+	tick = true;
+
+	ticks_since_startup++;
+
+	//ticks_since_startup += prev_alt_clock_load;
 	//PRINTF("Touch Value = %d\r\n", get_touch());
 }
 
 volatile ticktime_t now()
 {
-	return((ticks_since_startup + ((SysTick->LOAD + 1) - SysTick->VAL)) / (ALT_CLOCK_HZ / MS_PER_SEC));
+	return(ticks_since_startup / TICK_FREQ_HZ);
+	//return((ticks_since_startup + ((SysTick->LOAD + 1) - SysTick->VAL)) / (ALT_CLOCK_HZ / MS_PER_SEC));
 }
