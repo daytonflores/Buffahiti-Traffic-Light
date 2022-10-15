@@ -125,7 +125,7 @@ typedef unsigned int ticktime_t;
  * \var		ticktime_t ticks_since_startup
  * \brief	Defined in systick.c
  */
-extern ticktime_t ticks_since_startup;
+extern volatile ticktime_t ticks_since_startup;
 
 /**
  * \fn		void init_onboard_systick
@@ -151,7 +151,7 @@ void SysTick_Handler(void);
  * \return	Time since startup in sixteenths of a second
  * \brief   Returns time since startup, in sixteenths of a second
  */
-ticktime_t now(void);
+volatile ticktime_t now(void);
 
 /**
  * \fn		void reset_timer

@@ -90,11 +90,16 @@ int main(void)
     init_onboard_systick();
 
     /**
+     * Turn on appropriate on-board LEDs based on current state
+     */
+	set_onboard_leds();
+
+    /**
      * Modify SysTick->CTRL register to enable the counter
      */
 	ENABLE_SYSTICK_COUNTER();
 
-	PRINTF("%06u ms: Entering main loop...\r\n", now());
+	PRINTF("%07u ms: Entering main loop...\r\n", now());
 
     while(1) {
 
@@ -102,11 +107,6 @@ int main(void)
          * Set by SysTick_Handler
          */
         if(transitioning){
-
-            /**
-             * Modify SysTick->CTRL register to disable the counter
-             */
-        	DISABLE_SYSTICK_COUNTER();
 
             /**
              * Set current state to next state, and set next state appropriately
@@ -117,11 +117,6 @@ int main(void)
              * Turn on appropriate on-board LEDs based on current state
              */
         	set_onboard_leds();
-
-            /**
-             * Modify SysTick->CTRL register to enable the counter
-             */
-        	ENABLE_SYSTICK_COUNTER();
         }
     }
     return 0;

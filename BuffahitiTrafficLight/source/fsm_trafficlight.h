@@ -142,13 +142,13 @@ extern volatile bool transitioning;
  * \var		extern state_t current
  * \brief	Declared in fsm_trafficlight.c
  */
-extern state_t current;
+extern volatile state_t current;
 
 /**
  * \var		extern state_t next
  * \brief	Declared in fsm_trafficlight.c
  */
-extern state_t next;
+extern volatile state_t next;
 
 /**
  * \fn		void init_fsm_trafficlight

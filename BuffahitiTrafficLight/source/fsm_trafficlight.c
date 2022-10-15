@@ -29,13 +29,13 @@ volatile bool transitioning = false;
  * \var		state_t current
  * \brief	The current state of the traffic light
  */
-state_t current;
+volatile state_t current;
 
 /**
  * \var		state_t next
  * \brief	The next state of the traffic light
  */
-state_t next;
+volatile state_t next;
 
 void init_fsm_trafficlight(void)
 {
@@ -57,7 +57,7 @@ void init_fsm_trafficlight(void)
 #ifdef DEBUG
 void transition_state()
 {
-	PRINTF("%06u ms: Transitioning from %s to %s\r\n",\
+	PRINTF("%07u ms: Transitioning from %s to %s\r\n",\
 			now(),\
 			current.mode == STOP ?\
 					"STOP" :\
@@ -83,23 +83,23 @@ void transition_state()
 	current.green_level = next.green_level;
 	current.blue_level = next.blue_level;
 
-	switch(next.mode){
+	switch(current.mode){
 	case GO:
-		ALT_CLOCK_LOAD(SEC_PER_WARNING);
+		ALT_CLOCK_LOAD(SEC_PER_GO);
 		next.mode = WARNING;
 		next.red_level = WARNING_RED_LEVEL;
 		next.green_level = WARNING_GREEN_LEVEL;
 		next.blue_level = WARNING_BLUE_LEVEL;
 		break;
 	case WARNING:
-		ALT_CLOCK_LOAD(SEC_PER_STOP);
+		ALT_CLOCK_LOAD(SEC_PER_WARNING);
 		next.mode = STOP;
 		next.red_level = STOP_RED_LEVEL;
 		next.green_level = STOP_GREEN_LEVEL;
 		next.blue_level = STOP_BLUE_LEVEL;
 		break;
 	case STOP:
-		ALT_CLOCK_LOAD(SEC_PER_GO);
+		ALT_CLOCK_LOAD(SEC_PER_STOP);
 		next.mode = GO;
 		next.red_level = GO_RED_LEVEL;
 		next.green_level = GO_GREEN_LEVEL;

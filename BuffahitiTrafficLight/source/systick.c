@@ -22,7 +22,7 @@
  * \var		ticktime_t ticks_since_startup
  * \brief	Ticks since boot, where each tick is 1 ms
  */
-ticktime_t ticks_since_startup = 0;
+volatile ticktime_t ticks_since_startup = 0;
 
 void init_onboard_systick()
 {
@@ -30,6 +30,8 @@ void init_onboard_systick()
      * Set the SysTick interrupt priority (range 0 to 3, with 0 being highest priority)
      */
 	NVIC_SetPriority(SysTick_IRQn, 3);
+
+	ALT_CLOCK_LOAD(SEC_PER_GO);
 
 	/**
      * Configure SysTick VAL register:
@@ -54,7 +56,7 @@ void SysTick_Handler()
 	//PRINTF("Touch Value = %d\r\n", get_touch());
 }
 
-ticktime_t now()
+volatile ticktime_t now()
 {
 	return((ticks_since_startup + ((SysTick->LOAD + 1) - SysTick->VAL)) / (ALT_CLOCK_HZ / MS_PER_SEC));
 }
