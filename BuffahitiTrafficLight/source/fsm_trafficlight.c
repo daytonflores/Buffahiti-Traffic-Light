@@ -37,8 +37,21 @@ volatile state_t current;
  */
 volatile state_t next;
 
+/**
+ * \var		extern volatile int i
+ * \brief	Declared in main.c
+ */
+//extern volatile int i;
+
+/**
+ * \var		uint32_t prev_alt_clock_load;
+ * \brief	Holds the value stored in SysTick->LOAD register from previous iteration
+ */
+uint32_t prev_alt_clock_load;
+
 void init_fsm_trafficlight(void)
 {
+	prev_alt_clock_load = ((ALT_CLOCK_HZ - 1) * SEC_PER_STOP);
 	ALT_CLOCK_LOAD(SEC_PER_STOP);
 
 	current.mode = STOP;
@@ -85,21 +98,24 @@ void transition_state()
 
 	switch(current.mode){
 	case GO:
-		ALT_CLOCK_LOAD(SEC_PER_GO);
+		prev_alt_clock_load = ((ALT_CLOCK_HZ - 1) * SEC_PER_GO);
+		ALT_CLOCK_LOAD(SEC_PER_WARNING);
 		next.mode = WARNING;
 		next.red_level = WARNING_RED_LEVEL;
 		next.green_level = WARNING_GREEN_LEVEL;
 		next.blue_level = WARNING_BLUE_LEVEL;
 		break;
 	case WARNING:
-		ALT_CLOCK_LOAD(SEC_PER_WARNING);
+		prev_alt_clock_load = ((ALT_CLOCK_HZ - 1) * SEC_PER_WARNING);
+		ALT_CLOCK_LOAD(SEC_PER_STOP);
 		next.mode = STOP;
 		next.red_level = STOP_RED_LEVEL;
 		next.green_level = STOP_GREEN_LEVEL;
 		next.blue_level = STOP_BLUE_LEVEL;
 		break;
 	case STOP:
-		ALT_CLOCK_LOAD(SEC_PER_STOP);
+		prev_alt_clock_load = ((ALT_CLOCK_HZ - 1) * SEC_PER_STOP);
+		ALT_CLOCK_LOAD(SEC_PER_GO);
 		next.mode = GO;
 		next.red_level = GO_RED_LEVEL;
 		next.green_level = GO_GREEN_LEVEL;
@@ -119,20 +135,26 @@ void transition_state()
 	current.green_level = next.green_level;
 	current.blue_level = next.blue_level;
 
-	switch(next.mode){
+	switch(current.mode){
 	case GO:
+		prev_alt_clock_load = ((ALT_CLOCK_HZ - 1) * SEC_PER_GO);
+		ALT_CLOCK_LOAD(SEC_PER_WARNING);
 		next.mode = WARNING;
 		next.red_level = WARNING_RED_LEVEL;
 		next.green_level = WARNING_GREEN_LEVEL;
 		next.blue_level = WARNING_BLUE_LEVEL;
 		break;
 	case WARNING:
+		prev_alt_clock_load = ((ALT_CLOCK_HZ - 1) * SEC_PER_WARNING);
+		ALT_CLOCK_LOAD(SEC_PER_STOP);
 		next.mode = STOP;
 		next.red_level = STOP_RED_LEVEL;
 		next.green_level = STOP_GREEN_LEVEL;
 		next.blue_level = STOP_BLUE_LEVEL;
 		break;
 	case STOP:
+		prev_alt_clock_load = ((ALT_CLOCK_HZ - 1) * SEC_PER_STOP);
+		ALT_CLOCK_LOAD(SEC_PER_GO);
 		next.mode = GO;
 		next.red_level = GO_RED_LEVEL;
 		next.green_level = GO_GREEN_LEVEL;

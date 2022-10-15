@@ -56,6 +56,12 @@
  * @brief   Application entry point.
  */
 
+/**
+ * \var		volatile int i
+ * \brief	The amount of times SysTick overflow has occurred
+ */
+//volatile int i;
+
 #ifdef DEBUG
 int main(void)
 {
@@ -93,11 +99,6 @@ int main(void)
      * Turn on appropriate on-board LEDs based on current state
      */
 	set_onboard_leds();
-
-    /**
-     * Modify SysTick->CTRL register to enable the counter
-     */
-	ENABLE_SYSTICK_COUNTER();
 
 	PRINTF("%07u ms: Entering main loop...\r\n", now());
 
@@ -145,50 +146,36 @@ int main(void)
     init_onboard_touch_sensor();
 
     /**
+     * Initialize the global current and next states
+     */
+    init_fsm_trafficlight();
+
+    /**
      * Initialize SysTick on-board timer
      */
     init_onboard_systick();
 
     /**
-     * Initialize the global current and next states
+     * Turn on appropriate on-board LEDs based on current state
      */
-    init_fsm_trafficlight();
-
-    ALT_CLOCK_LOAD(SEC_PER_STOP);
-	ENABLE_SYSTICK_COUNTER();
-	RED_LED_ON();
-	GREEN_LED_OFF();
-	BLUE_LED_OFF();
+	set_onboard_leds();
 
     while(1) {
+
+        /**
+         * Set by SysTick_Handler
+         */
         if(transitioning){
+
+            /**
+             * Set current state to next state, and set next state appropriately
+             */
         	transition_state();
 
-        	DISABLE_SYSTICK_COUNTER();
-
-        	switch(current.mode){
-        	case STOP:
-        		ALT_CLOCK_LOAD(SEC_PER_STOP);
-        		RED_LED_ON();
-        		GREEN_LED_OFF();
-        		BLUE_LED_OFF();
-        		break;
-        	case GO:
-        		ALT_CLOCK_LOAD(SEC_PER_GO);
-        		RED_LED_OFF();
-        		GREEN_LED_ON();
-        		BLUE_LED_OFF();
-        		break;
-        	case WARNING:
-        		ALT_CLOCK_LOAD(SEC_PER_WARNING);
-        		RED_LED_ON();
-        		GREEN_LED_ON();
-        		BLUE_LED_OFF();
-        	case CROSSWALK:
-        		break;
-        	}
-
-        	ENABLE_SYSTICK_COUNTER();
+            /**
+             * Turn on appropriate on-board LEDs based on current state
+             */
+        	set_onboard_leds();
         }
     }
     return 0;

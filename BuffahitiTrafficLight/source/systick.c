@@ -24,14 +24,30 @@
  */
 volatile ticktime_t ticks_since_startup = 0;
 
+/**
+ * \var		extern volatile int i
+ * \brief	Declared in main.c
+ */
+//extern volatile int i;
+
+/**
+ * \var		extern uint32_t prev_alt_clock_load;
+ * \brief	Declared in fsm_trafficlight.c
+ */
+extern uint32_t prev_alt_clock_load;
+
 void init_onboard_systick()
 {
+    /**
+     * Configure the SysTick LOAD register:
+     * 	- To the expected LOAD for initial STOP state
+     */
+	ALT_CLOCK_LOAD(SEC_PER_GO);
+
 	/**
      * Set the SysTick interrupt priority (range 0 to 3, with 0 being highest priority)
      */
 	NVIC_SetPriority(SysTick_IRQn, 3);
-
-	ALT_CLOCK_LOAD(SEC_PER_GO);
 
 	/**
      * Configure SysTick VAL register:
@@ -47,11 +63,17 @@ void init_onboard_systick()
 	SysTick->CTRL =
 		SysTick_CTRL_CLKSOURCE_EXT_Msk |
 		SysTick_CTRL_TICKINT_Msk;
+
+    /**
+     * Modify SysTick->CTRL register to enable the counter
+     */
+	ENABLE_SYSTICK_COUNTER();
 }
 
 void SysTick_Handler()
 {
-	ticks_since_startup += (SysTick->LOAD + 1);
+	//i++;
+	ticks_since_startup += prev_alt_clock_load;
 	transitioning = true;
 	//PRINTF("Touch Value = %d\r\n", get_touch());
 }
