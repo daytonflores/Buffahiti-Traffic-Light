@@ -159,6 +159,22 @@ extern volatile state_t next;
 void init_fsm_trafficlight(void);
 
 /**
+ * \fn		bool enough_time_stable
+ * \param	N/A
+ * \return	Returns true if enough stable time has been spent in current state
+ * \brief   Checks whether enough stable time (not including time to transition) has been spent in current state
+ */
+bool enough_time_stable(void);
+
+/**
+ * \fn		bool enough_time_transitioning
+ * \param	N/A
+ * \return	Returns true if enough time has been spent transitioning in current state
+ * \brief   Checks whether enough transitioning time (not including time spent stable) has been spent in current state
+ */
+bool enough_time_transitioning(void);
+
+/**
  * \fn		void transition_state
  * \param	N/A
  * \return	N/A

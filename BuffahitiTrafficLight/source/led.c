@@ -71,3 +71,10 @@ void set_onboard_leds(void)
 		break;
 	}
 }
+
+void step_leds(void)
+{
+	current.red_level += (current.red_level - next.red_level) / (ticks_since_startup & (TICK_HZ - 1));
+	current.green_level += (current.green_level - next.green_level) / (ticks_since_startup & (TICK_HZ - 1));
+	current.blue_level += (current.blue_level - next.blue_level) / (ticks_since_startup & (TICK_HZ - 1));
+}

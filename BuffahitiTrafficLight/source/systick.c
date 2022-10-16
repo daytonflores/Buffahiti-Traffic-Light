@@ -20,9 +20,21 @@
 
 /**
  * \var		ticktime_t ticks_since_startup
- * \brief	Ticks since boot, where each tick is 1 ms
+ * \brief	Ticks since boot, where each tick is 62.5 ms
  */
 volatile ticktime_t ticks_since_startup = 0;
+
+/**
+ * \var		volatile ticktime_t ticks_spent_transitioning
+ * \brief	Ticks spent transitioning to current state, where each tick is 62.5 ms
+ */
+volatile ticktime_t ticks_spent_transitioning = 0;
+
+/**
+ * \var		volatile ticktime_t ticks_spent_stable
+ * \brief	Ticks spent in current state (not including transition period), where each tick is 62.5 ms
+ */
+volatile ticktime_t ticks_spent_stable = 0;
 
 /**
  * \var		extern volatile int i
@@ -31,18 +43,24 @@ volatile ticktime_t ticks_since_startup = 0;
 //extern volatile int i;
 
 /**
+ * \var		volatile bool tick
+ * \brief	Flag controlled by SysTick timer
+ */
+volatile bool tick = false;
+
+/**
  * \var		extern uint32_t prev_alt_clock_load;
  * \brief	Declared in fsm_trafficlight.c
  */
 extern uint32_t prev_alt_clock_load;
 
-void init_onboard_systick()
+void init_onboard_systick(void)
 {
     /**
      * Configure the SysTick LOAD register:
-     * 	- To the expected LOAD for initial STOP state
+     * 	- To generate interrupt every TICK_SEC
      */
-	ALT_CLOCK_LOAD(SEC_PER_GO);
+	ALT_CLOCK_LOAD(TICK_SEC);
 
 	/**
      * Set the SysTick interrupt priority (range 0 to 3, with 0 being highest priority)
@@ -70,15 +88,25 @@ void init_onboard_systick()
 	ENABLE_SYSTICK_COUNTER();
 }
 
-void SysTick_Handler()
+void SysTick_Handler(void)
 {
 	//i++;
-	ticks_since_startup += prev_alt_clock_load;
-	transitioning = true;
+	//ticks_since_startup += prev_alt_clock_load;
+	ticks_since_startup++;
+
+	if(transitioning){
+		ticks_spent_transitioning++;
+	}
+	else{
+		ticks_spent_stable++;
+	}
+
+	tick = true;
 	//PRINTF("Touch Value = %d\r\n", get_touch());
 }
 
-volatile ticktime_t now()
+volatile uint32_t now(void)
 {
-	return((ticks_since_startup + ((SysTick->LOAD + 1) - SysTick->VAL)) / (ALT_CLOCK_HZ / MS_PER_SEC));
+	//return((ticks_since_startup + ((SysTick->LOAD + 1) - SysTick->VAL)) / (ALT_CLOCK_HZ / MS_PER_SEC));
+	return((ticks_since_startup * TICK_SEC * MS_PER_SEC));
 }

@@ -62,6 +62,24 @@
  */
 //volatile int i;
 
+/**
+ * \var		extern volatile bool tick
+ * \brief	Defined in systick.c
+ */
+extern volatile bool tick;
+
+/**
+ * \var		extern volatile ticktime_t ticks_spent_transitioning
+ * \brief	Defined in systick.c
+ */
+extern volatile ticktime_t ticks_spent_transitioning;
+
+/**
+ * \var		extern volatile ticktime_t ticks_spent_stable
+ * \brief	Defined in systick.c
+ */
+extern volatile ticktime_t ticks_spent_stable;
+
 #ifdef DEBUG
 int main(void)
 {
@@ -100,19 +118,83 @@ int main(void)
      */
 	set_onboard_leds();
 
+	PRINTF("%07u ms: Initialized current state to %s\r\n",\
+			now(),\
+			current.mode == STOP ?\
+					"STOP" :\
+					current.mode == GO ?\
+							"GO" :\
+							current.mode == WARNING ?\
+									"WARNING" :\
+									current.mode == CROSSWALK?\
+											"CROSSWALK" :\
+											"UNKNOWN");
+
+	PRINTF("%07u ms: Initialized next state to %s\r\n",\
+			now(),\
+			next.mode == STOP ?\
+					"STOP" :\
+					next.mode == GO ?\
+							"GO" :\
+							next.mode == WARNING ?\
+									"WARNING" :\
+									next.mode == CROSSWALK?\
+											"CROSSWALK" :\
+											"UNKNOWN");
+
 	PRINTF("%07u ms: Entering main loop...\r\n", now());
 
     while(1) {
 
         /**
-         * Set by SysTick_Handler
+         * Set by SysTick_Handler every TICK_SEC
          */
-        if(transitioning){
+        if(tick){
 
             /**
-             * Set current state to next state, and set next state appropriately
+             * Reset flag that was set by SysTick ISR
              */
-        	transition_state();
+        	tick = false;
+
+        	if(enough_time_stable()){
+        		ticks_spent_stable = 0;
+        		transitioning = true;
+        		transition_state();
+        	}
+
+        	if(enough_time_transitioning()){
+        		ticks_spent_transitioning = 0;
+        		transitioning = false;
+        		PRINTF("%07u ms: Done transitioning to %s\r\n",\
+        				now(),\
+        				current.mode == STOP ?\
+        						"STOP" :\
+        						current.mode == GO ?\
+        								"GO" :\
+        								current.mode == WARNING ?\
+        										"WARNING" :\
+        										current.mode == CROSSWALK?\
+        												"CROSSWALK" :\
+        												"UNKNOWN");
+        	}
+
+            /**
+             * If current state LEDs are transitioning then step the RGB LEDs
+             */
+        	if(transitioning){
+        		step_leds();
+        	}
+
+            /**
+             * Every 1 sec
+             */
+        	//if((ticks_since_startup > 0) && ((ticks_since_startup & (TICK_HZ - 1)) == 0)){
+
+                /**
+                 * Set current state to next state, and set next state appropriately
+                 */
+            //	transition_state();
+        	//}
 
             /**
              * Turn on appropriate on-board LEDs based on current state

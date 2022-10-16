@@ -40,6 +40,20 @@
 	(0UL << SysTick_CTRL_CLKSOURCE_Pos)
 
 /**
+ * \def		TICK_HZ
+ * \brief	The frequency at which SysTick interrupts should be raised in Hz
+ */
+#define TICK_HZ\
+	(16)
+
+/**
+ * \def		TICK_SEC
+ * \brief	The period between SysTick interrupts in sec
+ */
+#define TICK_SEC\
+	(1.0/TICK_HZ)
+
+/**
  * \def		PRIM_CLOCK_LOAD_SEC(x)
  * \param	x The amount of seconds between each SysTick interrupt
  * \brief	The value to place into SysTick->LOAD register in order for interrupts to be generated
@@ -56,6 +70,7 @@
  */
 #define ALT_CLOCK_LOAD(x)\
 	SysTick->LOAD = ((ALT_CLOCK_HZ - 1) * x)
+
 
 #ifdef DEBUG
 /**
@@ -78,6 +93,13 @@
  */
 #define SEC_PER_WARNING\
 	(3)
+
+/**
+ * \def		SEC_PER_TRANSITION
+ * \brief	The amount of time in sec to be transitioning between states
+ */
+#define SEC_PER_TRANSITION\
+	(1)
 #elif NDEBUG
 /**
  * \def		SEC_PER_STOP
@@ -128,6 +150,12 @@ typedef unsigned int ticktime_t;
 extern volatile ticktime_t ticks_since_startup;
 
 /**
+ * \var		extern volatile bool tick
+ * \brief	Defined in systick.c
+ */
+extern volatile bool tick;
+
+/**
  * \fn		void init_onboard_systick
  * \param	N/A
  * \return	N/A
@@ -146,12 +174,12 @@ void init_onboard_systick(void);
 void SysTick_Handler(void);
 
 /**
- * \fn		ticktime_t now
+ * \fn		uint32_t now
  * \param	N/A
- * \return	Time since startup in sixteenths of a second
- * \brief   Returns time since startup, in sixteenths of a second
+ * \return	Time since startup in ms
+ * \brief   Returns time since startup, in ms
  */
-volatile ticktime_t now(void);
+volatile uint32_t now(void);
 
 /**
  * \fn		void reset_timer

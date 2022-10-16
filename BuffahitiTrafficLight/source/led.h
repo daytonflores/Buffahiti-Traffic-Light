@@ -152,4 +152,12 @@ void init_onboard_leds(void);
  */
 void set_onboard_leds(void);
 
+/**
+ * \fn		void step_leds
+ * \param	N/A
+ * \return	N/A
+ * \brief   Calculate and step current state's RGB values
+ */
+void step_leds(void);
+
 #endif /* LED_H_ */
