@@ -49,6 +49,24 @@ extern volatile ticktime_t ticks_spent_transitioning;
  */
 extern volatile ticktime_t ticks_spent_stable;
 
+/**
+ * \var		extern volatile uint8_t red_level_end
+ * \brief	Defined in led.c
+ */
+extern volatile uint8_t red_level_end;
+
+/**
+ * \var		volatile uint8_t green_level_end
+ * \brief	Defined in led.c
+ */
+extern volatile uint8_t green_level_end;
+
+/**
+ * \var		volatile uint8_t blue_level_end
+ * \brief	Defined in led.c
+ */
+extern volatile uint8_t blue_level_end;
+
 void init_fsm_trafficlight(void)
 {
 
@@ -138,9 +156,10 @@ void transition_state(void)
 												"CROSSWALK" :\
 												"UNKNOWN");
 		current.mode = CROSSWALK;
-		current.red_level = CROSSWALK_RED_LEVEL;
-		current.green_level = CROSSWALK_GREEN_LEVEL;
-		current.blue_level = CROSSWALK_BLUE_LEVEL;
+
+		red_level_end = CROSSWALK_RED_LEVEL;
+		green_level_end = CROSSWALK_GREEN_LEVEL;
+		blue_level_end = CROSSWALK_BLUE_LEVEL;
 
 		next.mode = GO;
 		next.red_level = GO_RED_LEVEL;
@@ -167,9 +186,10 @@ void transition_state(void)
 													"UNKNOWN");
 
 			current.mode = next.mode;
-			current.red_level = next.red_level;
-			current.green_level = next.green_level;
-			current.blue_level = next.blue_level;
+
+			red_level_end = next.red_level;
+			green_level_end = next.green_level;
+			blue_level_end = next.blue_level;
 
 			next.mode = WARNING;
 			next.red_level = WARNING_RED_LEVEL;
@@ -191,9 +211,10 @@ void transition_state(void)
 													"UNKNOWN");
 
 			current.mode = next.mode;
-			current.red_level = next.red_level;
-			current.green_level = next.green_level;
-			current.blue_level = next.blue_level;
+
+			red_level_end = next.red_level;
+			green_level_end = next.green_level;
+			blue_level_end = next.blue_level;
 
 			next.mode = STOP;
 			next.red_level = STOP_RED_LEVEL;
@@ -215,9 +236,10 @@ void transition_state(void)
 													"UNKNOWN");
 
 			current.mode = next.mode;
-			current.red_level = next.red_level;
-			current.green_level = next.green_level;
-			current.blue_level = next.blue_level;
+
+			red_level_end = next.red_level;
+			green_level_end = next.green_level;
+			blue_level_end = next.blue_level;
 
 			next.mode = GO;
 			next.red_level = GO_RED_LEVEL;
@@ -239,9 +261,10 @@ void transition_state(void)
 													"UNKNOWN");
 
 			current.mode = next.mode;
-			current.red_level = next.red_level;
-			current.green_level = next.green_level;
-			current.blue_level = next.blue_level;
+
+			red_level_end = next.red_level;
+			green_level_end = next.green_level;
+			blue_level_end = next.blue_level;
 
 			next.mode = WARNING;
 			next.red_level = WARNING_RED_LEVEL;
@@ -265,9 +288,10 @@ void transition_state(void)
 		button_pressed = false;
 
 		current.mode = CROSSWALK;
-		current.red_level = CROSSWALK_RED_LEVEL;
-		current.green_level = CROSSWALK_GREEN_LEVEL;
-		current.blue_level = CROSSWALK_BLUE_LEVEL;
+
+		red_level_end = CROSSWALK_RED_LEVEL;
+		green_level_end = CROSSWALK_GREEN_LEVEL;
+		blue_level_end = CROSSWALK_BLUE_LEVEL;
 
 		next.mode = GO;
 		next.red_level = GO_RED_LEVEL;
@@ -283,9 +307,10 @@ void transition_state(void)
 		case STOP:
 
 			current.mode = next.mode;
-			current.red_level = next.red_level;
-			current.green_level = next.green_level;
-			current.blue_level = next.blue_level;
+
+			red_level_end = next.red_level;
+			green_level_end = next.green_level;
+			blue_level_end = next.blue_level;
 
 			next.mode = WARNING;
 			next.red_level = WARNING_RED_LEVEL;
@@ -296,9 +321,10 @@ void transition_state(void)
 		case GO:
 
 			current.mode = next.mode;
-			current.red_level = next.red_level;
-			current.green_level = next.green_level;
-			current.blue_level = next.blue_level;
+
+			red_level_end = next.red_level;
+			green_level_end = next.green_level;
+			blue_level_end = next.blue_level;
 
 			next.mode = STOP;
 			next.red_level = STOP_RED_LEVEL;
@@ -309,9 +335,10 @@ void transition_state(void)
 		case WARNING:
 
 			current.mode = next.mode;
-			current.red_level = next.red_level;
-			current.green_level = next.green_level;
-			current.blue_level = next.blue_level;
+
+			red_level_end = next.red_level;
+			green_level_end = next.green_level;
+			blue_level_end = next.blue_level;
 
 			next.mode = GO;
 			next.red_level = GO_RED_LEVEL;
@@ -322,9 +349,10 @@ void transition_state(void)
 		case CROSSWALK:
 
 			current.mode = next.mode;
-			current.red_level = next.red_level;
-			current.green_level = next.green_level;
-			current.blue_level = next.blue_level;
+
+			red_level_end = next.red_level;
+			green_level_end = next.green_level;
+			blue_level_end = next.blue_level;
 
 			next.mode = WARNING;
 			next.red_level = WARNING_RED_LEVEL;

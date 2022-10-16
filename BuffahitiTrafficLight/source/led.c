@@ -12,6 +12,24 @@
 #include "led.h"
 #include "systick.h"
 
+/**
+ * \var		volatile uint8_t red_level_end
+ * \brief	The red level current state is transitioning towards
+ */
+volatile uint8_t red_level_end;
+
+/**
+ * \var		volatile uint8_t green_level_end
+ * \brief	The green level current state is transitioning towards
+ */
+volatile uint8_t green_level_end;
+
+/**
+ * \var		volatile uint8_t blue_level_end
+ * \brief	The blue level current state is transitioning towards
+ */
+volatile uint8_t blue_level_end;
+
 void init_onboard_leds(void)
 {
 	/**
@@ -88,7 +106,11 @@ void step_leds(void)
      * If we were dealing with floats, then the steps could be calculated during transition_state
      * and this function would just increment the same steps per tick.
      */
-	current.red_level += (current.red_level - next.red_level) / (ticks_since_startup & (TICK_HZ - 1));
-	current.green_level += (current.green_level - next.green_level) / (ticks_since_startup & (TICK_HZ - 1));
-	current.blue_level += (current.blue_level - next.blue_level) / (ticks_since_startup & (TICK_HZ - 1));
+	int8_t red_step = (red_level_end - current.red_level) / (uint8_t)(((SEC_PER_TRANSITION * TICK_HZ)) - ticks_spent_transitioning);
+	int8_t green_step = (green_level_end - current.green_level) / (uint8_t)(((SEC_PER_TRANSITION * TICK_HZ)) - ticks_spent_transitioning);
+	int8_t blue_step = (blue_level_end - current.blue_level) / (uint8_t)(((SEC_PER_TRANSITION * TICK_HZ)) - ticks_spent_transitioning);
+
+	current.red_level += red_step;
+	current.green_level += green_step;
+	current.blue_level += blue_step;
 }

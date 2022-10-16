@@ -157,6 +157,18 @@ typedef unsigned int ticktime_t;
 extern volatile ticktime_t ticks_since_startup;
 
 /**
+ * \var		extern volatile ticktime_t ticks_spent_stable
+ * \brief	Defined in systick.c
+ */
+extern volatile ticktime_t ticks_spent_stable;
+
+/**
+ * \var		extern volatile ticktime_t ticks_spent_transitioning
+ * \brief	Defined in systick.c
+ */
+extern volatile ticktime_t ticks_spent_transitioning;
+
+/**
  * \var		extern volatile bool tick
  * \brief	Defined in systick.c
  */
