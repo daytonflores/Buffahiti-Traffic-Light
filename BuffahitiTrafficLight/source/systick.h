@@ -95,6 +95,13 @@
 	(3)
 
 /**
+ * \def		SEC_PER_CROSSWALK
+ * \brief	The amount of total time in sec to stay in CROSSWALK mode
+ */
+#define SEC_PER_CROSSWALK\
+	(10)
+
+/**
  * \def		SEC_PER_TRANSITION
  * \brief	The amount of time in sec to be transitioning between states
  */

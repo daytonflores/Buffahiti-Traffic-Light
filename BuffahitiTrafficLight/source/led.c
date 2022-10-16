@@ -68,6 +68,9 @@ void set_onboard_leds(void)
 		GREEN_LED_ON();
 		BLUE_LED_OFF();
 	case CROSSWALK:
+		RED_LED_ON();
+		GREEN_LED_ON();
+		BLUE_LED_ON();
 		break;
 	}
 }

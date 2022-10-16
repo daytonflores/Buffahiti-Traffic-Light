@@ -80,6 +80,12 @@ extern volatile ticktime_t ticks_spent_transitioning;
  */
 extern volatile ticktime_t ticks_spent_stable;
 
+/**
+ * \var		volatile bool button_pressed
+ * \brief	Defined in fsm_trafficlight.c
+ */
+extern volatile bool button_pressed;
+
 #ifdef DEBUG
 int main(void)
 {
@@ -118,18 +124,6 @@ int main(void)
      */
 	set_onboard_leds();
 
-	PRINTF("%07u ms: Initialized current state to %s\r\n",\
-			now(),\
-			current.mode == STOP ?\
-					"STOP" :\
-					current.mode == GO ?\
-							"GO" :\
-							current.mode == WARNING ?\
-									"WARNING" :\
-									current.mode == CROSSWALK?\
-											"CROSSWALK" :\
-											"UNKNOWN");
-
 	PRINTF("%07u ms: Initialized next state to %s\r\n",\
 			now(),\
 			next.mode == STOP ?\
@@ -139,6 +133,18 @@ int main(void)
 							next.mode == WARNING ?\
 									"WARNING" :\
 									next.mode == CROSSWALK?\
+											"CROSSWALK" :\
+											"UNKNOWN");
+
+	PRINTF("%07u ms: Initialized current state to %s\r\n",\
+			now(),\
+			current.mode == STOP ?\
+					"STOP" :\
+					current.mode == GO ?\
+							"GO" :\
+							current.mode == WARNING ?\
+									"WARNING" :\
+									current.mode == CROSSWALK?\
 											"CROSSWALK" :\
 											"UNKNOWN");
 
@@ -156,16 +162,22 @@ int main(void)
              */
         	tick = false;
 
-        	if(enough_time_stable()){
+        	if(current.mode != CROSSWALK && touchpad_is_touched()){
+        		button_pressed = true;
+        		ticks_spent_stable = 0;
+        		ticks_spent_transitioning = 0;
+        		transitioning = true;
+        		transition_state();
+        	}
+        	else if(!transitioning && enough_time_stable()){
         		ticks_spent_stable = 0;
         		transitioning = true;
         		transition_state();
         	}
-
-        	if(enough_time_transitioning()){
+        	else if(transitioning && enough_time_transitioning()){
         		ticks_spent_transitioning = 0;
         		transitioning = false;
-        		PRINTF("%07u ms: Done transitioning to %s\r\n",\
+        		PRINTF("%07u ms: Done transitioning to %s. Staying for %u sec...\r\n",\
         				now(),\
         				current.mode == STOP ?\
         						"STOP" :\
@@ -175,13 +187,21 @@ int main(void)
         										"WARNING" :\
         										current.mode == CROSSWALK?\
         												"CROSSWALK" :\
-        												"UNKNOWN");
+        												"UNKNOWN",\
+						current.mode == STOP ?\
+								SEC_PER_STOP :\
+								current.mode == GO ?\
+										SEC_PER_GO :\
+										current.mode == WARNING ?\
+												SEC_PER_WARNING :\
+												current.mode == CROSSWALK?\
+														SEC_PER_CROSSWALK :\
+														0);
         	}
-
-            /**
-             * If current state LEDs are transitioning then step the RGB LEDs
-             */
-        	if(transitioning){
+        	/**
+        	 *  If current state LEDs are transitioning then step the RGB LEDs
+        	 */
+        	else if(transitioning){
         		step_leds();
         	}
 

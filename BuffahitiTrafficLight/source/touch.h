@@ -111,11 +111,10 @@
 	(TSI0->DATA & 0xFFFF)
 
 /**
- * \def		TOUCH_UNTOUCHED_MAX
- * \brief	Any (scanned_value - TOUCH_OFFSET) less than 100 will consider the touch sensor
- * 			to be untouched
+ * \def		MIN_TOUCH
+ * \brief	Any (scanned_value - TOUCH_OFFSET) greater than 100 will be considered a touch
  */
-#define TOUCH_UNTOUCHED_MAX\
+#define MIN_TOUCH\
 	(100)
 
 /**
@@ -148,5 +147,13 @@ void init_onboard_touch_sensor(void);
  * 			(https://github.com/alexander-g-dean/ESF/tree/master/NXP/Misc/Touch%20Sense)
  */
 uint32_t get_touch(void);
+
+/**
+ * \fn		bool touchpad_is_touched
+ * \brief	Will calculate the current touch value and determine whether touchpad is being touched
+ * \param	N/A
+ * \return	Returns true if the touch sensor detects a touch
+ */
+bool touchpad_is_touched(void);
 
 #endif /* TOUCH_H_ */

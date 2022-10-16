@@ -67,3 +67,14 @@ uint32_t get_touch(void)
 	 */
 	return (TOUCH_DATA - TOUCH_OFFSET);
 }
+
+bool touchpad_is_touched(void)
+{
+	bool return_value = false;
+
+	if(get_touch() > MIN_TOUCH){
+		return_value = true;
+	}
+
+	return (return_value);
+}

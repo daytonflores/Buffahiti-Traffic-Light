@@ -17,7 +17,7 @@
  * \var		volatile bool button_pressed
  * \brief	Flag controlled by physically touching the on-board touch sensor
  */
-volatile bool button_pressed;
+volatile bool button_pressed = false;
 
 /**
  * \var		volatile bool transitioning
@@ -81,34 +81,28 @@ void init_fsm_trafficlight(void)
 
 bool enough_time_stable(void)
 {
-	bool return_value;
+	bool return_value = false;
 
 	switch(current.mode){
 	case STOP:
 		if((ticks_spent_stable * TICK_SEC) >= SEC_PER_STOP){
 			return_value = true;
 		}
-		else{
-			return_value = false;
-		}
 		break;
 	case GO:
 		if((ticks_spent_stable * TICK_SEC) >= SEC_PER_GO){
 			return_value = true;
-		}
-		else{
-			return_value = false;
 		}
 		break;
 	case WARNING:
 		if((ticks_spent_stable * TICK_SEC) >= SEC_PER_WARNING){
 			return_value = true;
 		}
-		else{
-			return_value = false;
-		}
 		break;
 	case CROSSWALK:
+		if((ticks_spent_stable * TICK_SEC) >= SEC_PER_CROSSWALK){
+			return_value = true;
+		}
 		break;
 	default:
 		break;
@@ -130,84 +124,130 @@ bool enough_time_transitioning(void)
 #ifdef DEBUG
 void transition_state(void)
 {
-	switch(current.mode){
-	case STOP:
-		//prev_alt_clock_load = ((ALT_CLOCK_HZ - 1) * SEC_PER_STOP);
-		//ALT_CLOCK_LOAD(SEC_PER_GO);
-		PRINTF("%07u ms: Transitioning from STOP to %s\r\n",\
+	if(button_pressed){
+		button_pressed = false;
+		PRINTF("%07u ms: Transitioning from %s to CROSSWALK\r\n",\
 				now(),\
-				next.mode == STOP ?\
+				current.mode == STOP ?\
 						"STOP" :\
-						next.mode == GO ?\
+						current.mode == GO ?\
 								"GO" :\
-								next.mode == WARNING ?\
+								current.mode == WARNING ?\
 										"WARNING" :\
-										next.mode == CROSSWALK?\
+										current.mode == CROSSWALK?\
 												"CROSSWALK" :\
 												"UNKNOWN");
-
-		current.mode = next.mode;
-		current.red_level = next.red_level;
-		current.green_level = next.green_level;
-		current.blue_level = next.blue_level;
-
-		next.mode = WARNING;
-		next.red_level = WARNING_RED_LEVEL;
-		next.green_level = WARNING_GREEN_LEVEL;
-		next.blue_level = WARNING_BLUE_LEVEL;
-		break;
-	case GO:
-		//prev_alt_clock_load = ((ALT_CLOCK_HZ - 1) * SEC_PER_GO);
-		//ALT_CLOCK_LOAD(SEC_PER_WARNING);
-		PRINTF("%07u ms: Transitioning from GO to %s\r\n",\
-				now(),\
-				next.mode == STOP ?\
-						"STOP" :\
-						next.mode == GO ?\
-								"GO" :\
-								next.mode == WARNING ?\
-										"WARNING" :\
-										next.mode == CROSSWALK?\
-												"CROSSWALK" :\
-												"UNKNOWN");
-
-		current.mode = next.mode;
-		current.red_level = next.red_level;
-		current.green_level = next.green_level;
-		current.blue_level = next.blue_level;
-
-		next.mode = STOP;
-		next.red_level = STOP_RED_LEVEL;
-		next.green_level = STOP_GREEN_LEVEL;
-		next.blue_level = STOP_BLUE_LEVEL;
-		break;
-	case WARNING:
-		//prev_alt_clock_load = ((ALT_CLOCK_HZ - 1) * SEC_PER_WARNING);
-		//ALT_CLOCK_LOAD(SEC_PER_STOP);
-		PRINTF("%07u ms: Transitioning from WARNING to %s\r\n",\
-				now(),\
-				next.mode == STOP ?\
-						"STOP" :\
-						next.mode == GO ?\
-								"GO" :\
-								next.mode == WARNING ?\
-										"WARNING" :\
-										next.mode == CROSSWALK?\
-												"CROSSWALK" :\
-												"UNKNOWN");
-
-		current.mode = next.mode;
-		current.red_level = next.red_level;
-		current.green_level = next.green_level;
-		current.blue_level = next.blue_level;
+		current.mode = CROSSWALK;
+		current.red_level = CROSSWALK_RED_LEVEL;
+		current.green_level = CROSSWALK_GREEN_LEVEL;
+		current.blue_level = CROSSWALK_BLUE_LEVEL;
 
 		next.mode = GO;
 		next.red_level = GO_RED_LEVEL;
 		next.green_level = GO_GREEN_LEVEL;
 		next.blue_level = GO_BLUE_LEVEL;
-		break;
-	case CROSSWALK:
-		break;
+	}
+	else{
+		switch(current.mode){
+		case STOP:
+			//prev_alt_clock_load = ((ALT_CLOCK_HZ - 1) * SEC_PER_STOP);
+			//ALT_CLOCK_LOAD(SEC_PER_GO);
+			PRINTF("%07u ms: Transitioning from STOP to %s\r\n",\
+					now(),\
+					next.mode == STOP ?\
+							"STOP" :\
+							next.mode == GO ?\
+									"GO" :\
+									next.mode == WARNING ?\
+											"WARNING" :\
+											next.mode == CROSSWALK?\
+													"CROSSWALK" :\
+													"UNKNOWN");
+
+			current.mode = next.mode;
+			current.red_level = next.red_level;
+			current.green_level = next.green_level;
+			current.blue_level = next.blue_level;
+
+			next.mode = WARNING;
+			next.red_level = WARNING_RED_LEVEL;
+			next.green_level = WARNING_GREEN_LEVEL;
+			next.blue_level = WARNING_BLUE_LEVEL;
+			break;
+		case GO:
+			//prev_alt_clock_load = ((ALT_CLOCK_HZ - 1) * SEC_PER_GO);
+			//ALT_CLOCK_LOAD(SEC_PER_WARNING);
+			PRINTF("%07u ms: Transitioning from GO to %s\r\n",\
+					now(),\
+					next.mode == STOP ?\
+							"STOP" :\
+							next.mode == GO ?\
+									"GO" :\
+									next.mode == WARNING ?\
+											"WARNING" :\
+											next.mode == CROSSWALK?\
+													"CROSSWALK" :\
+													"UNKNOWN");
+
+			current.mode = next.mode;
+			current.red_level = next.red_level;
+			current.green_level = next.green_level;
+			current.blue_level = next.blue_level;
+
+			next.mode = STOP;
+			next.red_level = STOP_RED_LEVEL;
+			next.green_level = STOP_GREEN_LEVEL;
+			next.blue_level = STOP_BLUE_LEVEL;
+			break;
+		case WARNING:
+			//prev_alt_clock_load = ((ALT_CLOCK_HZ - 1) * SEC_PER_WARNING);
+			//ALT_CLOCK_LOAD(SEC_PER_STOP);
+			PRINTF("%07u ms: Transitioning from WARNING to %s\r\n",\
+					now(),\
+					next.mode == STOP ?\
+							"STOP" :\
+							next.mode == GO ?\
+									"GO" :\
+									next.mode == WARNING ?\
+											"WARNING" :\
+											next.mode == CROSSWALK?\
+													"CROSSWALK" :\
+													"UNKNOWN");
+
+			current.mode = next.mode;
+			current.red_level = next.red_level;
+			current.green_level = next.green_level;
+			current.blue_level = next.blue_level;
+
+			next.mode = GO;
+			next.red_level = GO_RED_LEVEL;
+			next.green_level = GO_GREEN_LEVEL;
+			next.blue_level = GO_BLUE_LEVEL;
+			break;
+		case CROSSWALK:
+			PRINTF("%07u ms: Transitioning from CROSSWALK to %s\r\n",\
+					now(),\
+					next.mode == STOP ?\
+							"STOP" :\
+							next.mode == GO ?\
+									"GO" :\
+									next.mode == WARNING ?\
+											"WARNING" :\
+											next.mode == CROSSWALK?\
+													"CROSSWALK" :\
+													"UNKNOWN");
+
+			current.mode = next.mode;
+			current.red_level = next.red_level;
+			current.green_level = next.green_level;
+			current.blue_level = next.blue_level;
+
+			next.mode = WARNING;
+			next.red_level = WARNING_RED_LEVEL;
+			next.green_level = WARNING_GREEN_LEVEL;
+			next.blue_level = WARNING_BLUE_LEVEL;
+			break;
+		}
 	}
 }
 #elif NDEBUG
