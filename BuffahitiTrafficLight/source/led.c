@@ -1,12 +1,15 @@
 /**
  * \file    led.c
  * \author	Dayton Flores (dafl2542@colorado.edu)
- * \date	10/14/2022
+ * \date	10/16/2022
  * \brief   Function definitions for on-board LEDs
  */
 
 #include "board.h"
 
+/**
+ * User-defined libraries
+ */
 #include "bitops.h"
 #include "fsm_trafficlight.h"
 #include "led.h"
@@ -71,31 +74,10 @@ void init_onboard_leds(void)
 
 void set_onboard_leds(void)
 {
-    /**
-     * Hard flip LEDs (as opposed to transitioning) for debugging purposes
-     */
-	//switch(current.mode){
-	//case STOP:
-	//	RED_LED_ON();
-	//	GREEN_LED_OFF();
-	//	BLUE_LED_OFF();
-	//	break;
-	//case GO:
-	//	RED_LED_OFF();
-	//	GREEN_LED_ON();
-	//	BLUE_LED_OFF();
-	//	break;
-	//case WARNING:
-	//	RED_LED_ON();
-	//	GREEN_LED_ON();
-	//	BLUE_LED_OFF();
-	//case CROSSWALK:
-	//	RED_LED_ON();
-	//	GREEN_LED_ON();
-	//	BLUE_LED_ON();
-	//	break;
-	//}
 
+    /**
+     * Set all on-board LEDs to the current state's RGB levels. Note that on-board LEDs are active-low
+     */
 	TPM2->CONTROLS[RED_LED_TPM2_CHANNEL].CnV = current.red_level;
 	TPM2->CONTROLS[GREEN_LED_TPM2_CHANNEL].CnV = current.green_level;
 	TPM0->CONTROLS[BLUE_LED_TPM0_CHANNEL].CnV = current.blue_level;

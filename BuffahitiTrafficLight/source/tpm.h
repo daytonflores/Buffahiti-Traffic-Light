@@ -1,7 +1,7 @@
 /**
  * \file    tpm.h
  * \author	Dayton Flores (dafl2542@colorado.edu)
- * \date	10/14/2022
+ * \date	10/16/2022
  * \brief   Macros and function headers for TPM (Timer PWM Module)
  */
 
@@ -53,29 +53,6 @@
 	(48000000)
 
 /**
- * \def		F_TPM_OVFLW
- * \brief
- */
-#define F_TPM_OVFLW\
-	(100000)
-
-/**
- * \def		F_TPM_PRESCALER
- * \brief	Configuration for hardware circuit that divides down the input signal's frequency by some factor
- * \detail	Can be 1, 2, 4, 8, 16, 32, 64, 128
- */
-#define F_TPM_PRESCALER\
-	(32)
-
-/**
- * \def		STEP_SIZE
- * \brief	The amount to change output data during each TPM interrupt
- * \detail	Keep in mind the DAC_RESOLUTION along with the TPM MOD value when configuring STEP_SIZE
- */
-#define STEP_SIZE\
-	(16)
-
-/**
  * \def		RED_LED_TPM2_CHANNEL
  * \brief	Red on-board LED is tied to TPM2 channel 0
  */
@@ -97,12 +74,18 @@
 	(1)
 
 /**
- * \def		DAC_RESOLUTION
- * \brief
+ * \def		TPM_RGB_MOD
+ * \brief	The value to load into TPM->MOD register. Set to 255 because we are working with RGB
  * \detail
  */
-#define DAC_RESOLUTION\
-	(4096)
+#define TPM_RGB_MOD\
+	(255)
+
+/**
+ * \var		extern uint8_t tpm_sc_ps;
+ * \brief	Defined in tpm.c
+ */
+extern uint8_t tpm_sc_ps;
 
 /**
  * \fn		void init_onboard_tpm
@@ -113,11 +96,11 @@
 void init_onboard_tpm(void);
 
 /**
- * \fn		void set_pwm_period
+ * \fn		uint8_t get_prescaler
  * \param	N/A
- * \return	N/A
- * \brief   Set the PWM period and the TPM->SC prescaler
+ * \return	x for 2^x, where 2^x is the TPM prescaler
+ * \brief   Calculate the smallest necessary TPM prescaler to provide the highest granularity
  */
-void set_pwm_period(void);
+uint8_t get_prescaler(void);
 
 #endif /* TPM_H_ */

@@ -1,7 +1,7 @@
 /**
  * \file    led.h
  * \author	Dayton Flores (dafl2542@colorado.edu)
- * \date	10/14/2022
+ * \date	10/16/2022
  * \brief   Macros and function headers for on-board LEDs
  */
 
@@ -155,6 +155,23 @@
 #define BLUE_LED_TOGGLE()\
 	(PTD->PTOR |= MASK(PORTD_BLUE_LED_PIN))
 
+/**
+ * \var		extern volatile uint8_t red_level_end
+ * \brief	Defined in led.c
+ */
+extern volatile uint8_t red_level_end;
+
+/**
+ * \var		extern volatile uint8_t green_level_end
+ * \brief	Defined in led.c
+ */
+ extern volatile uint8_t green_level_end;
+
+/**
+ * \var		extern volatile uint8_t blue_level_end
+ * \brief	Defined in led.c
+ */
+ extern volatile uint8_t blue_level_end;
 
 /**
  * \fn		void init_onboard_leds

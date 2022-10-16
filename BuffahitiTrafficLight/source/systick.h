@@ -1,7 +1,7 @@
 /**
  * \file    systick.h
  * \author	Dayton Flores (dafl2542@colorado.edu)
- * \date	10/14/2022
+ * \date	10/16/2022
  * \brief   Macros and function headers for on-board timing subsystem
  */
 
@@ -52,25 +52,6 @@
  */
 #define TICK_SEC\
 	(1.0/TICK_HZ)
-
-/**
- * \def		PRIM_CLOCK_LOAD_SEC(x)
- * \param	x The amount of seconds between each SysTick interrupt
- * \brief	The value to place into SysTick->LOAD register in order for interrupts to be generated
- * 			every x sec, based on PRIM_CLOCK_HZ
- */
-#define PRIM_CLOCK_LOAD_SEC(x)\
-	SysTick->LOAD = ((PRIM_CLOCK_HZ - 1) * x)
-
-/**
- * \def		ALT_CLOCK_LOAD(x)
- * \param	x The amount of seconds between each SysTick interrupt
- * \brief	The value to place into SysTick->LOAD register in order for interrupts to be generated
- * 			every x sec, based on ALT_CLOCK_HZ
- */
-#define ALT_CLOCK_LOAD(x)\
-	SysTick->LOAD = ((ALT_CLOCK_HZ - 1) * x)
-
 
 #ifdef DEBUG
 /**
@@ -128,20 +109,21 @@
  */
 #define SEC_PER_WARNING\
 	(5)
-#endif
-/**
- * \def		ENABLE_SYSTICK_COUNTER()
- * \brief	Configure SysTick CTRL register to enable the SysTick counter
- */
-#define ENABLE_SYSTICK_COUNTER()\
-	(SysTick->CTRL |= SysTick_CTRL_ENABLE_Msk)
 
 /**
- * \def		DISABLE_SYSTICK_COUNTER()
- * \brief	Configure SysTick CTRL register to disable the SysTick counter
+ * \def		SEC_PER_CROSSWALK
+ * \brief	The amount of total time in sec to stay in CROSSWALK mode
  */
-#define DISABLE_SYSTICK_COUNTER()\
-	(SysTick->CTRL &= ~(SysTick_CTRL_ENABLE_Msk))
+#define SEC_PER_CROSSWALK\
+	(10)
+
+/**
+ * \def		SEC_PER_TRANSITION
+ * \brief	The amount of time in sec to be transitioning between states
+ */
+#define SEC_PER_TRANSITION\
+	(1)
+#endif
 
 /**
  * \typedef	typedef unsigned int ticktime_t

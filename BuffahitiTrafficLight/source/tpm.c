@@ -1,13 +1,16 @@
 /**
  * \file    tpm.c
  * \author	Dayton Flores (dafl2542@colorado.edu)
- * \date	10/14/2022
+ * \date	10/16/2022
  * \brief   Function definitions for TPM (Timer PWM Module)
  */
 
 #include "board.h"
 #include "fsl_debug_console.h"
 
+/**
+ * User-defined libraries
+ */
 #include "bitops.h"
 #include "fsm_trafficlight.h"
 #include "led.h"
@@ -18,12 +21,6 @@
  * \brief	Holds x for 2^x, where 2^x is the tpm_prescaler
  */
 uint8_t tpm_sc_ps;
-
-/**
- * \var		uint16_t pwm_period;
- * \brief	The calculated PWM period in Hz to allow for largest possible TPM->MOD value
- */
-uint16_t pwm_period;
 
 void init_onboard_tpm(void)
 {
@@ -45,13 +42,13 @@ void init_onboard_tpm(void)
 	/**
      * Set the smallest needed prescaler along with PWM period for desired PWM frequency
      */
-	set_pwm_period();
+	tpm_sc_ps = get_prescaler();
 
 	/**
-     * Load the TPM MOD register with prescaler
+     * Load the TPM MOD register
      */
-	TPM0->MOD = 255;
-	TPM2->MOD = 255;
+	TPM0->MOD = TPM_RGB_MOD;
+	TPM2->MOD = TPM_RGB_MOD;
 
 	/**
      * Configure the TPM SC register:
@@ -97,42 +94,39 @@ void init_onboard_tpm(void)
 	TPM2->SC |= TPM_SC_CMOD(1);
 }
 
-void set_pwm_period(void)
+uint8_t get_prescaler(void)
 {
 	/**
      * Calculate the smallest needed prescaler to allow for largest possible TPM->MOD value
      * and thus more granular control
      */
+
+	uint8_t return_value;
+
 	if(((F_TPM_CLOCK_HZ / PWM_FREQ_HZ) / MAX_TPM_MOD_VALUE) < 1){
-		pwm_period = (uint16_t)((F_TPM_CLOCK_HZ / PWM_FREQ_HZ) / 1);
-		tpm_sc_ps = 0;
+		return_value = 0;
 	}
 	else if(((F_TPM_CLOCK_HZ / PWM_FREQ_HZ) / MAX_TPM_MOD_VALUE) < 2){
-		pwm_period = (uint16_t)((F_TPM_CLOCK_HZ / PWM_FREQ_HZ) / 2);
-		tpm_sc_ps = 1;
+		return_value = 1;
 	}
 	else if(((F_TPM_CLOCK_HZ / PWM_FREQ_HZ) / MAX_TPM_MOD_VALUE) < 4){
-		pwm_period = (uint16_t)((F_TPM_CLOCK_HZ / PWM_FREQ_HZ) / 4);
-		tpm_sc_ps = 2;
+		return_value = 2;
 	}
 	else if(((F_TPM_CLOCK_HZ / PWM_FREQ_HZ) / MAX_TPM_MOD_VALUE) < 8){
-		pwm_period = (uint16_t)((F_TPM_CLOCK_HZ / PWM_FREQ_HZ) / 8);
-		tpm_sc_ps = 3;
+		return_value = 3;
 	}
 	else if(((F_TPM_CLOCK_HZ / PWM_FREQ_HZ) / MAX_TPM_MOD_VALUE) < 16){
-		pwm_period = (uint16_t)((F_TPM_CLOCK_HZ / PWM_FREQ_HZ) / 16);
-		tpm_sc_ps = 4;
+		return_value = 4;
 	}
 	else if(((F_TPM_CLOCK_HZ / PWM_FREQ_HZ) / MAX_TPM_MOD_VALUE) < 32){
-		pwm_period = (uint16_t)((F_TPM_CLOCK_HZ / PWM_FREQ_HZ) / 32);
-		tpm_sc_ps = 5;
+		return_value = 5;
 	}
 	else if(((F_TPM_CLOCK_HZ / PWM_FREQ_HZ) / MAX_TPM_MOD_VALUE) < 64){
-		pwm_period = (uint16_t)((F_TPM_CLOCK_HZ / PWM_FREQ_HZ) / 64);
-		tpm_sc_ps = 6;
+		return_value = 6;
 	}
 	else{
-		pwm_period = (uint16_t)((F_TPM_CLOCK_HZ / PWM_FREQ_HZ) / 128);
-		tpm_sc_ps = 7;
+		return_value = 7;
 	}
+
+	return (return_value);
 }

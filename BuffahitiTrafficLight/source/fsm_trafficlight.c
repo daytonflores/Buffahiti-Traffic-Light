@@ -1,7 +1,7 @@
 /**
  * \file    fsm_trafficlight.c
  * \author	Dayton Flores (dafl2542@colorado.edu)
- * \date	10/14/2022
+ * \date	10/16/2022
  * \brief   Function definitions for FSM (finite state machine) implementation of traffic lights
  */
 
@@ -9,6 +9,9 @@
 #include <stdint.h>
 #include "fsl_debug_console.h"
 
+/**
+ * User-defined libraries
+ */
 #include "fsm_trafficlight.h"
 #include "led.h"
 #include "systick.h"
@@ -302,7 +305,6 @@ void transition_state(void)
 	else{
 		switch(current.mode){
 		case STOP:
-
 			current.mode = next.mode;
 
 			red_level_end = next.red_level;
@@ -316,7 +318,6 @@ void transition_state(void)
 			break;
 
 		case GO:
-
 			current.mode = next.mode;
 
 			red_level_end = next.red_level;
@@ -330,7 +331,6 @@ void transition_state(void)
 			break;
 
 		case WARNING:
-
 			current.mode = next.mode;
 
 			red_level_end = next.red_level;
@@ -344,7 +344,6 @@ void transition_state(void)
 			break;
 
 		case CROSSWALK:
-
 			current.mode = next.mode;
 
 			red_level_end = next.red_level;

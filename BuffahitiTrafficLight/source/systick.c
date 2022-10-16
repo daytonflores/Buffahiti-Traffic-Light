@@ -1,7 +1,7 @@
 /**
  * \file    systick.c
  * \author	Dayton Flores (dafl2542@colorado.edu)
- * \date	10/14/2022
+ * \date	10/16/2022
  * \brief   Function definitions for on-board SysTick
  */
 
@@ -12,6 +12,9 @@
 #include "core_cm0plus.h"
 #include "fsl_debug_console.h"
 
+/**
+ * User-defined libraries
+ */
 #include "bitops.h"
 #include "fsm_trafficlight.h"
 #include "led.h"
@@ -54,7 +57,7 @@ void init_onboard_systick(void)
      * Configure the SysTick LOAD register:
      * 	- To generate interrupt every TICK_SEC
      */
-	ALT_CLOCK_LOAD(TICK_SEC);
+	SysTick->LOAD = ((ALT_CLOCK_HZ - 1) * TICK_SEC);
 
 	/**
      * Set the SysTick interrupt priority (range 0 to 3, with 0 being highest priority)
@@ -79,7 +82,7 @@ void init_onboard_systick(void)
     /**
      * Modify SysTick->CTRL register to enable the counter
      */
-	ENABLE_SYSTICK_COUNTER();
+	SysTick->CTRL |= SysTick_CTRL_ENABLE_Msk;
 }
 
 void SysTick_Handler(void)

@@ -31,7 +31,7 @@
 /**
  * \file    main.c
  * \author	Dayton Flores (dafl2542@colorado.edu)
- * \date	10/14/2022
+ * \date	10/16/2022
  * \brief   Application entry point
  */
 
@@ -43,7 +43,9 @@
 #include "MKL25Z4.h"
 #include "fsl_debug_console.h"
 
-/* TODO: insert other include files here. */
+/**
+ * User-defined libraries
+ */
 #include "bitops.h"
 #include "fsm_trafficlight.h"
 #include "led.h"
@@ -51,35 +53,6 @@
 #include "touch.h"
 #include "tpm.h"
 
-/* TODO: insert other definitions and declarations here. */
-
-/*
- * @brief   Application entry point.
- */
-
-/**
- * \var		extern volatile bool tick
- * \brief	Defined in systick.c
- */
-extern volatile bool tick;
-
-/**
- * \var		extern volatile ticktime_t ticks_spent_transitioning
- * \brief	Defined in systick.c
- */
-extern volatile ticktime_t ticks_spent_transitioning;
-
-/**
- * \var		extern volatile ticktime_t ticks_spent_stable
- * \brief	Defined in systick.c
- */
-extern volatile ticktime_t ticks_spent_stable;
-
-/**
- * \var		volatile bool button_pressed
- * \brief	Defined in fsm_trafficlight.c
- */
-extern volatile bool button_pressed;
 
 #ifdef DEBUG
 int main(void)
@@ -234,6 +207,11 @@ int main(void)
     init_fsm_trafficlight();
 
     /**
+     * Initialize TPM on-board module
+     */
+    init_onboard_tpm();
+
+    /**
      * Initialize SysTick on-board timer
      */
     init_onboard_systick();
@@ -314,12 +292,8 @@ int main(void)
              */
         	else if(transitioning){
         		step_leds();
+        		set_onboard_leds();
         	}
-
-            /**
-             * Turn on appropriate on-board LEDs based on current state
-             */
-        	set_onboard_leds();
         }
     }
     return 0;

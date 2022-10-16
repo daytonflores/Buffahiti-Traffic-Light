@@ -1,7 +1,7 @@
 /**
  * \file    touch.h
  * \author	Dayton Flores (dafl2542@colorado.edu)
- * \date	10/14/2022
+ * \date	10/16/2022
  * \brief   Function definitions for on-board touch sensor
  */
 
@@ -9,6 +9,9 @@
 
 #include "board.h"
 
+/**
+ * User-defined libraries
+ */
 #include "touch.h"
 
 void init_onboard_touch_sensor(void)

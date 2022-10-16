@@ -1,7 +1,7 @@
 /**
  * \file    fsm_trafficlight.h
  * \author	Dayton Flores (dafl2542@colorado.edu)
- * \date	10/14/2022
+ * \date	10/16/2022
  * \brief   Macros and function headers for FSM (finite state machine) implementation of traffic lights
  */
 
