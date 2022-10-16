@@ -49,22 +49,8 @@ extern volatile ticktime_t ticks_spent_transitioning;
  */
 extern volatile ticktime_t ticks_spent_stable;
 
-/**
- * \var		extern volatile int i
- * \brief	Declared in main.c
- */
-//extern volatile int i;
-
-/**
- * \var		uint32_t prev_alt_clock_load;
- * \brief	Holds the value stored in SysTick->LOAD register from previous iteration
- */
-//uint32_t prev_alt_clock_load;
-
 void init_fsm_trafficlight(void)
 {
-	//prev_alt_clock_load = ((ALT_CLOCK_HZ - 1) * SEC_PER_STOP);
-	//ALT_CLOCK_LOAD(SEC_PER_STOP);
 
 	current.mode = STOP;
 	current.red_level = STOP_RED_LEVEL;
@@ -81,6 +67,9 @@ void init_fsm_trafficlight(void)
 
 bool enough_time_stable(void)
 {
+    /**
+     * Check if enough time has been spent stable in the current state (i.e. not transitioning)
+     */
 	bool return_value = false;
 
 	switch(current.mode){
@@ -113,6 +102,9 @@ bool enough_time_stable(void)
 
 bool enough_time_transitioning(void)
 {
+    /**
+     * Check if enough time has been spent transitioning to the current state (i.e. not stable)
+     */
 	if((ticks_spent_transitioning * TICK_SEC) >= SEC_PER_TRANSITION){
 		return true;
 	}
@@ -124,8 +116,16 @@ bool enough_time_transitioning(void)
 #ifdef DEBUG
 void transition_state(void)
 {
+    /**
+     * Button has been pressed so transition to CROSSWALK and set next state to GO
+     */
 	if(button_pressed){
+
+	    /**
+	     * Reset flag raised by touch sensor
+	     */
 		button_pressed = false;
+
 		PRINTF("%07u ms: Transitioning from %s to CROSSWALK\r\n",\
 				now(),\
 				current.mode == STOP ?\
@@ -147,11 +147,13 @@ void transition_state(void)
 		next.green_level = GO_GREEN_LEVEL;
 		next.blue_level = GO_BLUE_LEVEL;
 	}
+
+    /**
+     * Button has not been pressed so continue through FSM as normal
+     */
 	else{
 		switch(current.mode){
 		case STOP:
-			//prev_alt_clock_load = ((ALT_CLOCK_HZ - 1) * SEC_PER_STOP);
-			//ALT_CLOCK_LOAD(SEC_PER_GO);
 			PRINTF("%07u ms: Transitioning from STOP to %s\r\n",\
 					now(),\
 					next.mode == STOP ?\
@@ -174,9 +176,8 @@ void transition_state(void)
 			next.green_level = WARNING_GREEN_LEVEL;
 			next.blue_level = WARNING_BLUE_LEVEL;
 			break;
+
 		case GO:
-			//prev_alt_clock_load = ((ALT_CLOCK_HZ - 1) * SEC_PER_GO);
-			//ALT_CLOCK_LOAD(SEC_PER_WARNING);
 			PRINTF("%07u ms: Transitioning from GO to %s\r\n",\
 					now(),\
 					next.mode == STOP ?\
@@ -199,9 +200,8 @@ void transition_state(void)
 			next.green_level = STOP_GREEN_LEVEL;
 			next.blue_level = STOP_BLUE_LEVEL;
 			break;
+
 		case WARNING:
-			//prev_alt_clock_load = ((ALT_CLOCK_HZ - 1) * SEC_PER_WARNING);
-			//ALT_CLOCK_LOAD(SEC_PER_STOP);
 			PRINTF("%07u ms: Transitioning from WARNING to %s\r\n",\
 					now(),\
 					next.mode == STOP ?\
@@ -224,6 +224,7 @@ void transition_state(void)
 			next.green_level = GO_GREEN_LEVEL;
 			next.blue_level = GO_BLUE_LEVEL;
 			break;
+
 		case CROSSWALK:
 			PRINTF("%07u ms: Transitioning from CROSSWALK to %s\r\n",\
 					now(),\
@@ -251,42 +252,86 @@ void transition_state(void)
 	}
 }
 #elif NDEBUG
-void transition_state()
+void transition_state(void)
 {
-	current.mode = next.mode;
-	current.red_level = next.red_level;
-	current.green_level = next.green_level;
-	current.blue_level = next.blue_level;
+    /**
+     * Button has been pressed so transition to CROSSWALK and set next state to GO
+     */
+	if(button_pressed){
 
-	switch(current.mode){
-	case GO:
-		prev_alt_clock_load = ((ALT_CLOCK_HZ - 1) * SEC_PER_GO);
-		ALT_CLOCK_LOAD(SEC_PER_WARNING);
-		next.mode = WARNING;
-		next.red_level = WARNING_RED_LEVEL;
-		next.green_level = WARNING_GREEN_LEVEL;
-		next.blue_level = WARNING_BLUE_LEVEL;
-		break;
-	case WARNING:
-		prev_alt_clock_load = ((ALT_CLOCK_HZ - 1) * SEC_PER_WARNING);
-		ALT_CLOCK_LOAD(SEC_PER_STOP);
-		next.mode = STOP;
-		next.red_level = STOP_RED_LEVEL;
-		next.green_level = STOP_GREEN_LEVEL;
-		next.blue_level = STOP_BLUE_LEVEL;
-		break;
-	case STOP:
-		prev_alt_clock_load = ((ALT_CLOCK_HZ - 1) * SEC_PER_STOP);
-		ALT_CLOCK_LOAD(SEC_PER_GO);
+	    /**
+	     * Reset flag raised by touch sensor
+	     */
+		button_pressed = false;
+
+		current.mode = CROSSWALK;
+		current.red_level = CROSSWALK_RED_LEVEL;
+		current.green_level = CROSSWALK_GREEN_LEVEL;
+		current.blue_level = CROSSWALK_BLUE_LEVEL;
+
 		next.mode = GO;
 		next.red_level = GO_RED_LEVEL;
 		next.green_level = GO_GREEN_LEVEL;
 		next.blue_level = GO_BLUE_LEVEL;
-		break;
-	case CROSSWALK:
-		break;
 	}
 
-	transitioning = false;
+    /**
+     * Button has not been pressed so continue through FSM as normal
+     */
+	else{
+		switch(current.mode){
+		case STOP:
+
+			current.mode = next.mode;
+			current.red_level = next.red_level;
+			current.green_level = next.green_level;
+			current.blue_level = next.blue_level;
+
+			next.mode = WARNING;
+			next.red_level = WARNING_RED_LEVEL;
+			next.green_level = WARNING_GREEN_LEVEL;
+			next.blue_level = WARNING_BLUE_LEVEL;
+			break;
+
+		case GO:
+
+			current.mode = next.mode;
+			current.red_level = next.red_level;
+			current.green_level = next.green_level;
+			current.blue_level = next.blue_level;
+
+			next.mode = STOP;
+			next.red_level = STOP_RED_LEVEL;
+			next.green_level = STOP_GREEN_LEVEL;
+			next.blue_level = STOP_BLUE_LEVEL;
+			break;
+
+		case WARNING:
+
+			current.mode = next.mode;
+			current.red_level = next.red_level;
+			current.green_level = next.green_level;
+			current.blue_level = next.blue_level;
+
+			next.mode = GO;
+			next.red_level = GO_RED_LEVEL;
+			next.green_level = GO_GREEN_LEVEL;
+			next.blue_level = GO_BLUE_LEVEL;
+			break;
+
+		case CROSSWALK:
+
+			current.mode = next.mode;
+			current.red_level = next.red_level;
+			current.green_level = next.green_level;
+			current.blue_level = next.blue_level;
+
+			next.mode = WARNING;
+			next.red_level = WARNING_RED_LEVEL;
+			next.green_level = WARNING_GREEN_LEVEL;
+			next.blue_level = WARNING_BLUE_LEVEL;
+			break;
+		}
+	}
 }
 #endif

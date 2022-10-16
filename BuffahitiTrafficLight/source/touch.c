@@ -70,6 +70,9 @@ uint32_t get_touch(void)
 
 bool touchpad_is_touched(void)
 {
+    /**
+     * Check if touchpad has been touched
+     */
 	bool return_value = false;
 
 	if(get_touch() > MIN_TOUCH){

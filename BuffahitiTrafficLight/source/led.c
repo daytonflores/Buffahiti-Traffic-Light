@@ -52,6 +52,9 @@ void init_onboard_leds(void)
 
 void set_onboard_leds(void)
 {
+    /**
+     * Hard flip LEDs (as opposed to transitioning) for debugging purposes
+     */
 	switch(current.mode){
 	case STOP:
 		RED_LED_ON();
@@ -77,6 +80,14 @@ void set_onboard_leds(void)
 
 void step_leds(void)
 {
+
+    /**
+     * Step current state's RGB values closer to the expected RGB values of this state.
+     * This function is invoked once per tick, yet the step needs to be recalculated each time
+     * since we are dealing with integers and rounding could take us far from target RGB values.
+     * If we were dealing with floats, then the steps could be calculated during transition_state
+     * and this function would just increment the same steps per tick.
+     */
 	current.red_level += (current.red_level - next.red_level) / (ticks_since_startup & (TICK_HZ - 1));
 	current.green_level += (current.green_level - next.green_level) / (ticks_since_startup & (TICK_HZ - 1));
 	current.blue_level += (current.blue_level - next.blue_level) / (ticks_since_startup & (TICK_HZ - 1));

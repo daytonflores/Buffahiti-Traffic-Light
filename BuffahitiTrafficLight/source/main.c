@@ -57,12 +57,6 @@
  */
 
 /**
- * \var		volatile int i
- * \brief	The amount of times SysTick overflow has occurred
- */
-//volatile int i;
-
-/**
  * \var		extern volatile bool tick
  * \brief	Defined in systick.c
  */
@@ -124,19 +118,9 @@ int main(void)
      */
 	set_onboard_leds();
 
-	PRINTF("%07u ms: Initialized next state to %s\r\n",\
-			now(),\
-			next.mode == STOP ?\
-					"STOP" :\
-					next.mode == GO ?\
-							"GO" :\
-							next.mode == WARNING ?\
-									"WARNING" :\
-									next.mode == CROSSWALK?\
-											"CROSSWALK" :\
-											"UNKNOWN");
+	PRINTF("%07u ms: Entering main loop...\r\n", now());
 
-	PRINTF("%07u ms: Initialized current state to %s\r\n",\
+	PRINTF("%07u ms: Initialized to %s. Staying for %u sec...\r\n",\
 			now(),\
 			current.mode == STOP ?\
 					"STOP" :\
@@ -146,10 +130,20 @@ int main(void)
 									"WARNING" :\
 									current.mode == CROSSWALK?\
 											"CROSSWALK" :\
-											"UNKNOWN");
+											"UNKNOWN",\
+			current.mode == STOP ?\
+					SEC_PER_STOP :\
+					current.mode == GO ?\
+							SEC_PER_GO :\
+							current.mode == WARNING ?\
+									SEC_PER_WARNING :\
+									current.mode == CROSSWALK?\
+											SEC_PER_CROSSWALK :\
+											0);
 
-	PRINTF("%07u ms: Entering main loop...\r\n", now());
-
+    /**
+     * Main infinite loop
+     */
     while(1) {
 
         /**
@@ -162,18 +156,52 @@ int main(void)
              */
         	tick = false;
 
+            /**
+             * Increment for timestamp purposes
+             */
+        	ticks_since_startup++;
+
+            /**
+             * Increment to track stable or transitioning periods
+             */
+        	if(transitioning){
+        		ticks_spent_transitioning++;
+        	}
+        	else{
+        		ticks_spent_stable++;
+        	}
+
+            /**
+             * First check if touchpad is touched and current state is not CROSSWALK.
+             * Then flag the button press, reset any ticks counted during previous state
+             * from when button was pushed, and flag the need to transition to CROSSWALK
+             */
         	if(current.mode != CROSSWALK && touchpad_is_touched()){
+
         		button_pressed = true;
+
         		ticks_spent_stable = 0;
         		ticks_spent_transitioning = 0;
+
         		transitioning = true;
+
         		transition_state();
         	}
+
+            /**
+             * Else if we have been stable in the current state for enough time, reset stable tick
+             * counter and begin transitioning
+             */
         	else if(!transitioning && enough_time_stable()){
         		ticks_spent_stable = 0;
         		transitioning = true;
         		transition_state();
         	}
+
+            /**
+             * Else if we have been transitioning to the current state for enough time, reset
+             * transitioning tick counter and begin tracking ticks as stable
+             */
         	else if(transitioning && enough_time_transitioning()){
         		ticks_spent_transitioning = 0;
         		transitioning = false;
@@ -198,23 +226,13 @@ int main(void)
 														SEC_PER_CROSSWALK :\
 														0);
         	}
-        	/**
-        	 *  If current state LEDs are transitioning then step the RGB LEDs
-        	 */
+
+            /**
+             * Else if we are transitioning but not for enough time, step the LEDs
+             */
         	else if(transitioning){
         		step_leds();
         	}
-
-            /**
-             * Every 1 sec
-             */
-        	//if((ticks_since_startup > 0) && ((ticks_since_startup & (TICK_HZ - 1)) == 0)){
-
-                /**
-                 * Set current state to next state, and set next state appropriately
-                 */
-            //	transition_state();
-        	//}
 
             /**
              * Turn on appropriate on-board LEDs based on current state
@@ -262,17 +280,78 @@ int main(void)
      */
 	set_onboard_leds();
 
+    /**
+     * Main infinite loop
+     */
     while(1) {
 
         /**
-         * Set by SysTick_Handler
+         * Set by SysTick_Handler every TICK_SEC
          */
-        if(transitioning){
+        if(tick){
 
             /**
-             * Set current state to next state, and set next state appropriately
+             * Reset flag that was set by SysTick ISR
              */
-        	transition_state();
+        	tick = false;
+
+            /**
+             * Increment for timestamp purposes
+             */
+        	ticks_since_startup++;
+
+            /**
+             * Increment to track stable or transitioning periods
+             */
+        	if(transitioning){
+        		ticks_spent_transitioning++;
+        	}
+        	else{
+        		ticks_spent_stable++;
+        	}
+
+            /**
+             * First check if touchpad is touched and current state is not CROSSWALK.
+             * Then flag the button press, reset any ticks counted during previous state
+             * from when button was pushed, and flag the need to transition to CROSSWALK
+             */
+        	if(current.mode != CROSSWALK && touchpad_is_touched()){
+
+        		button_pressed = true;
+
+        		ticks_spent_stable = 0;
+        		ticks_spent_transitioning = 0;
+
+        		transitioning = true;
+
+        		transition_state();
+        	}
+
+            /**
+             * Else if we have been stable in the current state for enough time, reset stable tick
+             * counter and begin transitioning
+             */
+        	else if(!transitioning && enough_time_stable()){
+        		ticks_spent_stable = 0;
+        		transitioning = true;
+        		transition_state();
+        	}
+
+            /**
+             * Else if we have been transitioning to the current state for enough time, reset
+             * transitioning tick counter and begin tracking ticks as stable
+             */
+        	else if(transitioning && enough_time_transitioning()){
+        		ticks_spent_transitioning = 0;
+        		transitioning = false;
+        	}
+
+            /**
+             * Else if we are transitioning but not for enough time, step the LEDs
+             */
+        	else if(transitioning){
+        		step_leds();
+        	}
 
             /**
              * Turn on appropriate on-board LEDs based on current state

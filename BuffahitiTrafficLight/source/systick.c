@@ -37,12 +37,6 @@ volatile ticktime_t ticks_spent_transitioning = 0;
 volatile ticktime_t ticks_spent_stable = 0;
 
 /**
- * \var		extern volatile int i
- * \brief	Declared in main.c
- */
-//extern volatile int i;
-
-/**
  * \var		volatile bool tick
  * \brief	Flag controlled by SysTick timer
  */
@@ -90,23 +84,16 @@ void init_onboard_systick(void)
 
 void SysTick_Handler(void)
 {
-	//i++;
-	//ticks_since_startup += prev_alt_clock_load;
-	ticks_since_startup++;
-
-	if(transitioning){
-		ticks_spent_transitioning++;
-	}
-	else{
-		ticks_spent_stable++;
-	}
-
+    /**
+     * Raise flag that TICK_SEC time has passed
+     */
 	tick = true;
-	//PRINTF("Touch Value = %d\r\n", get_touch());
 }
 
 volatile uint32_t now(void)
 {
-	//return((ticks_since_startup + ((SysTick->LOAD + 1) - SysTick->VAL)) / (ALT_CLOCK_HZ / MS_PER_SEC));
+    /**
+     * Convert ticks to sec, and then sec to ms
+     */
 	return((ticks_since_startup * TICK_SEC * MS_PER_SEC));
 }
