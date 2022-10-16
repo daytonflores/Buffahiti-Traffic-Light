@@ -9,15 +9,14 @@
 #define LED_H_
 
 /**
- * \def		PCR_MUX_SEL
+ * \def		PCR_MUX_SEL_RED
  * \brief	PCR is a 32-bit register where bits 8:10 are a MUX field
  * \detail
  * 		000: Pin disabled (analog)
  * 		001: GPIO
  * 		010: Alternative (see Chapter 2 of Alexander G Dean's Embedded Systems Fundamentals with
  * 			 ARM Cortex-M Based Microcontrollers: Embedded Systems)
- * 		011: Alternative (see Chapter 2 of Alexander G Dean's Embedded Systems Fundamentals with
- * 			 ARM Cortex-M Based Microcontrollers: Embedded Systems)
+ * 		011: TPM2_CH0
  * 		100: Alternative (see Chapter 2 of Alexander G Dean's Embedded Systems Fundamentals with
  * 			 ARM Cortex-M Based Microcontrollers: Embedded Systems)
  * 		101: Alternative (see Chapter 2 of Alexander G Dean's Embedded Systems Fundamentals with
@@ -27,8 +26,50 @@
  * 		111: Alternative (see Chapter 2 of Alexander G Dean's Embedded Systems Fundamentals with
  * 			 ARM Cortex-M Based Microcontrollers: Embedded Systems)
  */
-#define PCR_MUX_SEL\
-	(1)
+#define PCR_MUX_SEL_RED\
+	(3)
+
+/**
+ * \def		PCR_MUX_SEL_GREEN
+ * \brief	PCR is a 32-bit register where bits 8:10 are a MUX field
+ * \detail
+ * 		000: Pin disabled (analog)
+ * 		001: GPIO
+ * 		010: Alternative (see Chapter 2 of Alexander G Dean's Embedded Systems Fundamentals with
+ * 			 ARM Cortex-M Based Microcontrollers: Embedded Systems)
+ * 		011: TPM2_CH1
+ * 		100: Alternative (see Chapter 2 of Alexander G Dean's Embedded Systems Fundamentals with
+ * 			 ARM Cortex-M Based Microcontrollers: Embedded Systems)
+ * 		101: Alternative (see Chapter 2 of Alexander G Dean's Embedded Systems Fundamentals with
+ * 			 ARM Cortex-M Based Microcontrollers: Embedded Systems)
+ * 		110: Alternative (see Chapter 2 of Alexander G Dean's Embedded Systems Fundamentals with
+ * 			 ARM Cortex-M Based Microcontrollers: Embedded Systems)
+ * 		111: Alternative (see Chapter 2 of Alexander G Dean's Embedded Systems Fundamentals with
+ * 			 ARM Cortex-M Based Microcontrollers: Embedded Systems)
+ */
+#define PCR_MUX_SEL_GREEN\
+	(3)
+
+/**
+ * \def		PCR_MUX_SEL_BLUE
+ * \brief	PCR is a 32-bit register where bits 8:10 are a MUX field
+ * \detail
+ * 		000: Pin disabled (analog)
+ * 		001: GPIO
+ * 		010: Alternative (see Chapter 2 of Alexander G Dean's Embedded Systems Fundamentals with
+ * 			 ARM Cortex-M Based Microcontrollers: Embedded Systems)
+ * 		011: Alternative (see Chapter 2 of Alexander G Dean's Embedded Systems Fundamentals with
+ * 			 ARM Cortex-M Based Microcontrollers: Embedded Systems)
+ * 		100: TPM0_CH1
+ * 		101: Alternative (see Chapter 2 of Alexander G Dean's Embedded Systems Fundamentals with
+ * 			 ARM Cortex-M Based Microcontrollers: Embedded Systems)
+ * 		110: Alternative (see Chapter 2 of Alexander G Dean's Embedded Systems Fundamentals with
+ * 			 ARM Cortex-M Based Microcontrollers: Embedded Systems)
+ * 		111: Alternative (see Chapter 2 of Alexander G Dean's Embedded Systems Fundamentals with
+ * 			 ARM Cortex-M Based Microcontrollers: Embedded Systems)
+ */
+#define PCR_MUX_SEL_BLUE\
+	(4)
 
 /**
  * \def		PORTB_RED_LED_PIN
@@ -148,7 +189,7 @@ void init_onboard_leds(void);
  * \fn		void set_onboard_leds
  * \param	N/A
  * \return	N/A
- * \brief   Set on-board LEDs based on current state
+ * \brief   Set on-board LEDs based on current state's RGB values using TPM modules
  */
 void set_onboard_leds(void);
 

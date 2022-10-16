@@ -49,6 +49,7 @@
 #include "led.h"
 #include "systick.h"
 #include "touch.h"
+#include "tpm.h"
 
 /* TODO: insert other definitions and declarations here. */
 
@@ -109,6 +110,11 @@ int main(void)
     init_fsm_trafficlight();
 
     /**
+     * Initialize TPM on-board module
+     */
+    init_onboard_tpm();
+
+    /**
      * Initialize SysTick on-board timer
      */
     init_onboard_systick();
@@ -119,27 +125,7 @@ int main(void)
 	set_onboard_leds();
 
 	PRINTF("%07u ms: Entering main loop...\r\n", now());
-
-	PRINTF("%07u ms: Initialized to %s. Staying for %u sec...\r\n",\
-			now(),\
-			current.mode == STOP ?\
-					"STOP" :\
-					current.mode == GO ?\
-							"GO" :\
-							current.mode == WARNING ?\
-									"WARNING" :\
-									current.mode == CROSSWALK?\
-											"CROSSWALK" :\
-											"UNKNOWN",\
-			current.mode == STOP ?\
-					SEC_PER_STOP :\
-					current.mode == GO ?\
-							SEC_PER_GO :\
-							current.mode == WARNING ?\
-									SEC_PER_WARNING :\
-									current.mode == CROSSWALK?\
-											SEC_PER_CROSSWALK :\
-											0);
+	PRINTF("%07u ms: Initialized to %s. Staying for %u sec...\r\n", now(), mode_to_string(current.mode), mode_state_sec(current.mode));
 
     /**
      * Main infinite loop
@@ -205,26 +191,7 @@ int main(void)
         	else if(transitioning && enough_time_transitioning()){
         		ticks_spent_transitioning = 0;
         		transitioning = false;
-        		PRINTF("%07u ms: Done transitioning to %s. Staying for %u sec...\r\n",\
-        				now(),\
-        				current.mode == STOP ?\
-        						"STOP" :\
-        						current.mode == GO ?\
-        								"GO" :\
-        								current.mode == WARNING ?\
-        										"WARNING" :\
-        										current.mode == CROSSWALK?\
-        												"CROSSWALK" :\
-        												"UNKNOWN",\
-						current.mode == STOP ?\
-								SEC_PER_STOP :\
-								current.mode == GO ?\
-										SEC_PER_GO :\
-										current.mode == WARNING ?\
-												SEC_PER_WARNING :\
-												current.mode == CROSSWALK?\
-														SEC_PER_CROSSWALK :\
-														0);
+        		PRINTF("%07u ms: Done transitioning to %s. Staying for %u sec...\r\n", now(), mode_to_string(current.mode), mode_state_sec(current.mode));
         	}
 
             /**
@@ -232,12 +199,8 @@ int main(void)
              */
         	else if(transitioning){
         		step_leds();
+        		set_onboard_leds();
         	}
-
-            /**
-             * Turn on appropriate on-board LEDs based on current state
-             */
-        	set_onboard_leds();
         }
     }
     return 0;

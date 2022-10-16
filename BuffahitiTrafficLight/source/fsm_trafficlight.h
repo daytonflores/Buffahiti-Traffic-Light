@@ -159,6 +159,22 @@ extern volatile state_t next;
 void init_fsm_trafficlight(void);
 
 /**
+ * \fn		char *mode_to_string
+ * \param	mode_t mode The mode to return as char *
+ * \return	The mode in char * format
+ * \brief   To make printing mode with printf easy
+ */
+char *mode_to_string(mode_t mode);
+
+/**
+ * \fn		uint32_t mode_state_sec
+ * \param	mode_t mode The mode whose state time to return
+ * \return	The mode's state time
+ * \brief   To make printing mode's state time with printf easy
+ */
+uint32_t mode_state_sec(mode_t mode);
+
+/**
  * \fn		bool enough_time_stable
  * \param	N/A
  * \return	Returns true if enough stable time has been spent in current state

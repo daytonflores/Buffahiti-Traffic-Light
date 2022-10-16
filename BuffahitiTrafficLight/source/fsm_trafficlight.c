@@ -69,7 +69,6 @@ extern volatile uint8_t blue_level_end;
 
 void init_fsm_trafficlight(void)
 {
-
 	current.mode = STOP;
 	current.red_level = STOP_RED_LEVEL;
 	current.green_level = STOP_GREEN_LEVEL;
@@ -79,8 +78,56 @@ void init_fsm_trafficlight(void)
 	next.red_level = GO_RED_LEVEL;
 	next.green_level = GO_GREEN_LEVEL;
 	next.blue_level = GO_BLUE_LEVEL;
+}
 
-    set_onboard_leds();
+char *mode_to_string(mode_t mode)
+{
+	char *return_value;
+
+	switch(mode){
+	case STOP:
+		return_value = "STOP";
+		break;
+	case GO:
+		return_value = "GO";
+		break;
+	case WARNING:
+		return_value = "WARNING";
+		break;
+	case CROSSWALK:
+		return_value = "CROSSWALK";
+		break;
+	default:
+		return_value = "UNKNOWN";
+		break;
+	}
+
+	return (return_value);
+}
+
+uint32_t mode_state_sec(mode_t mode)
+{
+	uint32_t return_value;
+
+	switch(mode){
+	case STOP:
+		return_value = SEC_PER_STOP;
+		break;
+	case GO:
+		return_value = SEC_PER_GO;
+		break;
+	case WARNING:
+		return_value = SEC_PER_WARNING;
+		break;
+	case CROSSWALK:
+		return_value = SEC_PER_CROSSWALK;
+		break;
+	default:
+		return_value = 0;
+		break;
+	}
+
+	return (return_value);
 }
 
 bool enough_time_stable(void)
@@ -144,17 +191,7 @@ void transition_state(void)
 	     */
 		button_pressed = false;
 
-		PRINTF("%07u ms: Transitioning from %s to CROSSWALK\r\n",\
-				now(),\
-				current.mode == STOP ?\
-						"STOP" :\
-						current.mode == GO ?\
-								"GO" :\
-								current.mode == WARNING ?\
-										"WARNING" :\
-										current.mode == CROSSWALK?\
-												"CROSSWALK" :\
-												"UNKNOWN");
+		PRINTF("%07u ms: Transitioning from %s to CROSSWALK\r\n", now(), mode_to_string(current.mode));
 		current.mode = CROSSWALK;
 
 		red_level_end = CROSSWALK_RED_LEVEL;
@@ -173,17 +210,7 @@ void transition_state(void)
 	else{
 		switch(current.mode){
 		case STOP:
-			PRINTF("%07u ms: Transitioning from STOP to %s\r\n",\
-					now(),\
-					next.mode == STOP ?\
-							"STOP" :\
-							next.mode == GO ?\
-									"GO" :\
-									next.mode == WARNING ?\
-											"WARNING" :\
-											next.mode == CROSSWALK?\
-													"CROSSWALK" :\
-													"UNKNOWN");
+			PRINTF("%07u ms: Transitioning from STOP to %s\r\n", now(), mode_to_string(next.mode));
 
 			current.mode = next.mode;
 
@@ -198,17 +225,7 @@ void transition_state(void)
 			break;
 
 		case GO:
-			PRINTF("%07u ms: Transitioning from GO to %s\r\n",\
-					now(),\
-					next.mode == STOP ?\
-							"STOP" :\
-							next.mode == GO ?\
-									"GO" :\
-									next.mode == WARNING ?\
-											"WARNING" :\
-											next.mode == CROSSWALK?\
-													"CROSSWALK" :\
-													"UNKNOWN");
+			PRINTF("%07u ms: Transitioning from GO to %s\r\n", now(), mode_to_string(next.mode));
 
 			current.mode = next.mode;
 
@@ -223,17 +240,7 @@ void transition_state(void)
 			break;
 
 		case WARNING:
-			PRINTF("%07u ms: Transitioning from WARNING to %s\r\n",\
-					now(),\
-					next.mode == STOP ?\
-							"STOP" :\
-							next.mode == GO ?\
-									"GO" :\
-									next.mode == WARNING ?\
-											"WARNING" :\
-											next.mode == CROSSWALK?\
-													"CROSSWALK" :\
-													"UNKNOWN");
+			PRINTF("%07u ms: Transitioning from WARNING to %s\r\n", now(), mode_to_string(next.mode));
 
 			current.mode = next.mode;
 
@@ -248,17 +255,7 @@ void transition_state(void)
 			break;
 
 		case CROSSWALK:
-			PRINTF("%07u ms: Transitioning from CROSSWALK to %s\r\n",\
-					now(),\
-					next.mode == STOP ?\
-							"STOP" :\
-							next.mode == GO ?\
-									"GO" :\
-									next.mode == WARNING ?\
-											"WARNING" :\
-											next.mode == CROSSWALK?\
-													"CROSSWALK" :\
-													"UNKNOWN");
+			PRINTF("%07u ms: Transitioning from CROSSWALK to %s\r\n", now(), mode_to_string(next.mode));
 
 			current.mode = next.mode;
 

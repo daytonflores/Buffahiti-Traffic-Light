@@ -11,6 +11,7 @@
 #include "fsm_trafficlight.h"
 #include "led.h"
 #include "systick.h"
+#include "tpm.h"
 
 /**
  * \var		volatile uint8_t red_level_end
@@ -46,11 +47,11 @@ void init_onboard_leds(void)
      * The MUX selection in PCR is done with bits 10:8, where 001 is configuration as GPIO
      */
 	PORTB->PCR[PORTB_RED_LED_PIN] &= ~PORT_PCR_MUX_MASK;
-	PORTB->PCR[PORTB_RED_LED_PIN] |= PORT_PCR_MUX(PCR_MUX_SEL);
+	PORTB->PCR[PORTB_RED_LED_PIN] |= PORT_PCR_MUX(PCR_MUX_SEL_RED);
 	PORTB->PCR[PORTB_GREEN_LED_PIN] &= ~PORT_PCR_MUX_MASK;
-	PORTB->PCR[PORTB_GREEN_LED_PIN] |= PORT_PCR_MUX(PCR_MUX_SEL);
+	PORTB->PCR[PORTB_GREEN_LED_PIN] |= PORT_PCR_MUX(PCR_MUX_SEL_GREEN);
 	PORTD->PCR[PORTD_BLUE_LED_PIN] &= ~PORT_PCR_MUX_MASK;
-	PORTD->PCR[PORTD_BLUE_LED_PIN] |= PORT_PCR_MUX(PCR_MUX_SEL);
+	PORTD->PCR[PORTD_BLUE_LED_PIN] |= PORT_PCR_MUX(PCR_MUX_SEL_BLUE);
 
 	/**
 	 * Set PTB18 as output for red on-board LED
@@ -73,27 +74,31 @@ void set_onboard_leds(void)
     /**
      * Hard flip LEDs (as opposed to transitioning) for debugging purposes
      */
-	switch(current.mode){
-	case STOP:
-		RED_LED_ON();
-		GREEN_LED_OFF();
-		BLUE_LED_OFF();
-		break;
-	case GO:
-		RED_LED_OFF();
-		GREEN_LED_ON();
-		BLUE_LED_OFF();
-		break;
-	case WARNING:
-		RED_LED_ON();
-		GREEN_LED_ON();
-		BLUE_LED_OFF();
-	case CROSSWALK:
-		RED_LED_ON();
-		GREEN_LED_ON();
-		BLUE_LED_ON();
-		break;
-	}
+	//switch(current.mode){
+	//case STOP:
+	//	RED_LED_ON();
+	//	GREEN_LED_OFF();
+	//	BLUE_LED_OFF();
+	//	break;
+	//case GO:
+	//	RED_LED_OFF();
+	//	GREEN_LED_ON();
+	//	BLUE_LED_OFF();
+	//	break;
+	//case WARNING:
+	//	RED_LED_ON();
+	//	GREEN_LED_ON();
+	//	BLUE_LED_OFF();
+	//case CROSSWALK:
+	//	RED_LED_ON();
+	//	GREEN_LED_ON();
+	//	BLUE_LED_ON();
+	//	break;
+	//}
+
+	TPM2->CONTROLS[RED_LED_TPM2_CHANNEL].CnV = current.red_level;
+	TPM2->CONTROLS[GREEN_LED_TPM2_CHANNEL].CnV = current.green_level;
+	TPM0->CONTROLS[BLUE_LED_TPM0_CHANNEL].CnV = current.blue_level;
 }
 
 void step_leds(void)

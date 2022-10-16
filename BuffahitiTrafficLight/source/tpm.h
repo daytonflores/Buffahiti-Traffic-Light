@@ -9,17 +9,52 @@
 #define TPM_H_
 
 /**
- * \def		F_TPM_CLOCK
- * \brief
- * \detail
+ * \def		PWM_FREQ_HZ
+ * \brief	The desired frequency of the PWM in Hz
  */
-#define F_TPM_CLOCK\
+#define PWM_FREQ_HZ\
+	(500)
+
+/**
+ * \def		MAX_TPM_MOD_VALUE
+ * \brief	The max division factor for 16-bit TPM->MOD register
+ */
+#define MAX_TPM_MOD_VALUE\
+	(65536)
+
+/**
+ * \def		TPM_CLOCK_SRC
+ * \brief	Configuration for TPM clock source select
+ * \detail
+ * 		0: Disabled
+ * 		1: MCGFLLCLK (or MCGPLLCLK / 2)
+ * 		2: OSCERCLK
+ * 		3: MCGIRCLK
+ */
+#define TPM_CLOCK_SRC\
+	(1)
+
+/**
+ * \def		TPM_DBGMODE
+ * \brief	Configuration for TPM debug mode
+ * \detail
+ * 		0: LPTPM counter does not increment during debug. Trigger inputs and input capture events
+ * 		   are also ignored
+ * 		3: LPTPM counter continues to increment in debug mode
+ */
+#define TPM_DBGMODE\
+	(3)
+
+/**
+ * \def		F_TPM_CLOCK_HZ
+ * \brief	The frequency of TPM clock in Hz
+ */
+#define F_TPM_CLOCK_HZ\
 	(48000000)
 
 /**
  * \def		F_TPM_OVFLW
  * \brief
- * \detail
  */
 #define F_TPM_OVFLW\
 	(100000)
@@ -41,6 +76,27 @@
 	(16)
 
 /**
+ * \def		RED_LED_TPM2_CHANNEL
+ * \brief	Red on-board LED is tied to TPM2 channel 0
+ */
+#define RED_LED_TPM2_CHANNEL\
+	(0)
+
+/**
+ * \def		GREEN_LED_TPM2_CHANNEL
+ * \brief	Green on-board LED is tied to TPM2 channel 1
+ */
+#define GREEN_LED_TPM2_CHANNEL\
+	(1)
+
+/**
+ * \def		BLUE_LED_TPM0_CHANNEL
+ * \brief	Blue on-board LED is tied to TPM0 channel 1
+ */
+#define BLUE_LED_TPM0_CHANNEL\
+	(1)
+
+/**
  * \def		DAC_RESOLUTION
  * \brief
  * \detail
@@ -57,12 +113,11 @@
 void init_onboard_tpm(void);
 
 /**
- * \fn		void TPM0_IRQHandler
+ * \fn		void set_pwm_period
  * \param	N/A
- * \brief   The ISR for the TPM timer (i.e. runs each time the timer reaches 0).
- * \detail	FUNCTION NAME IS CASE SENSITIVE. Since it is weakly defined in
- * 			startup\startup_mkl25z4.c this definition will override
+ * \return	N/A
+ * \brief   Set the PWM period and the TPM->SC prescaler
  */
-void TPM0_IRQHandler(void);
+void set_pwm_period(void);
 
 #endif /* TPM_H_ */
