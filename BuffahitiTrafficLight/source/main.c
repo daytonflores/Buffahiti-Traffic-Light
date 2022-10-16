@@ -128,7 +128,21 @@ int main(void)
         	}
         	else{
         		ticks_spent_stable++;
+
+                /**
+                 * Increment to track CROSSWALK blink periods
+                 */
+            	if(current.mode == CROSSWALK){
+            		if(crosswalk_on){
+                		ticks_spent_crosswalk_on++;
+            		}
+            		else{
+                		ticks_spent_crosswalk_off++;
+            		}
+            	}
         	}
+
+
 
             /**
              * First check if touchpad is touched and current state is not CROSSWALK.
@@ -146,34 +160,62 @@ int main(void)
 
         		transition_state();
         	}
+        	else{
+        		if(!transitioning){
 
-            /**
-             * Else if we have been stable in the current state for enough time, reset stable tick
-             * counter and begin transitioning
-             */
-        	else if(!transitioning && enough_time_stable()){
-        		ticks_spent_stable = 0;
-        		transitioning = true;
-        		transition_state();
+                    /**
+                     * If we have been stable in the current state for enough time, reset stable tick
+                     * counter and begin transitioning
+                     */
+        			if(enough_time_stable()){
+						ticks_spent_stable = 0;
+						transitioning = true;
+						transition_state();
+					}
+
+        			/**
+					 * Else if we have kept the LED on for enough time this blink in the CROSSWALK state,
+					 * reset tick counter and turn off LEDs
+					 */
+        			else if(current.mode == CROSSWALK && enough_time_crosswalk_on()){
+                		ticks_spent_crosswalk_on = 0;
+            			crosswalk_on = false;
+            			clear_onboard_leds();
+            		}
+
+                    /**
+                     * Else if we have kept the LED off for enough time this blink in the CROSSWALK state,
+                     * reset tick counter and turn on LEDs
+                     */
+        			else if(current.mode == CROSSWALK && enough_time_crosswalk_off()){
+                		ticks_spent_crosswalk_off = 0;
+            			crosswalk_on = true;
+            			set_onboard_leds();
+            		}
+        		}
+        		else{
+
+        			/**
+					 * If we have been transitioning to the current state for enough time, reset
+					 * transitioning tick counter and begin tracking ticks as stable
+					 */
+        			if(enough_time_transitioning()){
+						ticks_spent_transitioning = 0;
+						transitioning = false;
+						PRINTF("%07u ms: Done transitioning to %s. Staying for %u sec...\r\n", now(), mode_to_string(current.mode), mode_state_sec(current.mode));
+					}
+
+                    /**
+                     * Else if we are transitioning but not for enough time, step the LEDs
+                     */
+        			else{
+						step_leds();
+						set_onboard_leds();
+        			}
+        		}
         	}
 
-            /**
-             * Else if we have been transitioning to the current state for enough time, reset
-             * transitioning tick counter and begin tracking ticks as stable
-             */
-        	else if(transitioning && enough_time_transitioning()){
-        		ticks_spent_transitioning = 0;
-        		transitioning = false;
-        		PRINTF("%07u ms: Done transitioning to %s. Staying for %u sec...\r\n", now(), mode_to_string(current.mode), mode_state_sec(current.mode));
-        	}
 
-            /**
-             * Else if we are transitioning but not for enough time, step the LEDs
-             */
-        	else if(transitioning){
-        		step_leds();
-        		set_onboard_leds();
-        	}
         }
     }
     return 0;
@@ -249,7 +291,21 @@ int main(void)
         	}
         	else{
         		ticks_spent_stable++;
+
+                /**
+                 * Increment to track CROSSWALK blink periods
+                 */
+            	if(current.mode == CROSSWALK){
+            		if(crosswalk_on){
+                		ticks_spent_crosswalk_on++;
+            		}
+            		else{
+                		ticks_spent_crosswalk_off++;
+            		}
+            	}
         	}
+
+
 
             /**
              * First check if touchpad is touched and current state is not CROSSWALK.
@@ -267,33 +323,61 @@ int main(void)
 
         		transition_state();
         	}
+        	else{
+        		if(!transitioning){
 
-            /**
-             * Else if we have been stable in the current state for enough time, reset stable tick
-             * counter and begin transitioning
-             */
-        	else if(!transitioning && enough_time_stable()){
-        		ticks_spent_stable = 0;
-        		transitioning = true;
-        		transition_state();
+                    /**
+                     * If we have been stable in the current state for enough time, reset stable tick
+                     * counter and begin transitioning
+                     */
+        			if(enough_time_stable()){
+						ticks_spent_stable = 0;
+						transitioning = true;
+						transition_state();
+					}
+
+        			/**
+					 * Else if we have kept the LED on for enough time this blink in the CROSSWALK state,
+					 * reset tick counter and turn off LEDs
+					 */
+        			else if(current.mode == CROSSWALK && enough_time_crosswalk_on()){
+                		ticks_spent_crosswalk_on = 0;
+            			crosswalk_on = false;
+            			clear_onboard_leds();
+            		}
+
+                    /**
+                     * Else if we have kept the LED off for enough time this blink in the CROSSWALK state,
+                     * reset tick counter and turn on LEDs
+                     */
+        			else if(current.mode == CROSSWALK && enough_time_crosswalk_off()){
+                		ticks_spent_crosswalk_off = 0;
+            			crosswalk_on = true;
+            			set_onboard_leds();
+            		}
+        		}
+        		else{
+
+        			/**
+					 * If we have been transitioning to the current state for enough time, reset
+					 * transitioning tick counter and begin tracking ticks as stable
+					 */
+        			if(enough_time_transitioning()){
+						ticks_spent_transitioning = 0;
+						transitioning = false;
+					}
+
+                    /**
+                     * Else if we are transitioning but not for enough time, step the LEDs
+                     */
+        			else{
+						step_leds();
+						set_onboard_leds();
+        			}
+        		}
         	}
 
-            /**
-             * Else if we have been transitioning to the current state for enough time, reset
-             * transitioning tick counter and begin tracking ticks as stable
-             */
-        	else if(transitioning && enough_time_transitioning()){
-        		ticks_spent_transitioning = 0;
-        		transitioning = false;
-        	}
 
-            /**
-             * Else if we are transitioning but not for enough time, step the LEDs
-             */
-        	else if(transitioning){
-        		step_leds();
-        		set_onboard_leds();
-        	}
         }
     }
     return 0;

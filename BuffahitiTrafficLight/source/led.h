@@ -203,6 +203,14 @@ extern volatile uint8_t red_level_end;
 void init_onboard_leds(void);
 
 /**
+ * \fn		void clear_onboard_leds
+ * \param	N/A
+ * \return	N/A
+ * \brief   Clear on-board LEDs
+ */
+void clear_onboard_leds(void);
+
+/**
  * \fn		void set_onboard_leds
  * \param	N/A
  * \return	N/A

@@ -40,16 +40,22 @@ volatile ticktime_t ticks_spent_transitioning = 0;
 volatile ticktime_t ticks_spent_stable = 0;
 
 /**
+ * \var		volatile ticktime_t ticks_spent_crosswalk_on
+ * \brief	Ticks spent with LED on for current blink in CROSSWALK state, where each tick is 62.5 ms
+ */
+volatile ticktime_t ticks_spent_crosswalk_on = 0;
+
+/**
+ * \var		volatile ticktime_t ticks_spent_crosswalk_off
+ * \brief	Ticks spent with LED off for current blink in CROSSWALK state, where each tick is 62.5 ms
+ */
+volatile ticktime_t ticks_spent_crosswalk_off = 0;
+
+/**
  * \var		volatile bool tick
  * \brief	Flag controlled by SysTick timer
  */
 volatile bool tick = false;
-
-/**
- * \var		extern uint32_t prev_alt_clock_load;
- * \brief	Declared in fsm_trafficlight.c
- */
-extern uint32_t prev_alt_clock_load;
 
 void init_onboard_systick(void)
 {
@@ -98,5 +104,5 @@ volatile uint32_t now(void)
     /**
      * Convert ticks to sec, and then sec to ms
      */
-	return((ticks_since_startup * TICK_SEC * MS_PER_SEC));
+	return((ticks_since_startup * TICK_SEC * MSEC_PER_SEC));
 }

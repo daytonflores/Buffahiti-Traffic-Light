@@ -139,6 +139,12 @@ extern volatile bool button_pressed;
 extern volatile bool transitioning;
 
 /**
+ * \var		extern volatile bool crosswalk_on
+ * \brief	Defined in fsm_trafficlight.c
+ */
+extern volatile bool crosswalk_on;
+
+/**
  * \var		extern state_t current
  * \brief	Declared in fsm_trafficlight.c
  */
@@ -189,6 +195,22 @@ bool enough_time_stable(void);
  * \brief   Checks whether enough transitioning time (not including time spent stable) has been spent in current state
  */
 bool enough_time_transitioning(void);
+
+/**
+ * \fn		bool enough_time_crosswalk_on
+ * \param	N/A
+ * \return	Returns true if enough time has been spent keeping LED on in CROSSWALK mode for blink
+ * \brief   Checks whether enough time has been spent keeping LED on in CROSSWALK mode for blink
+ */
+bool enough_time_crosswalk_on(void);
+
+/**
+ * \fn		bool enough_time_crosswalk_off
+ * \param	N/A
+ * \return	Returns true if enough time has been spent keeping LED off in CROSSWALK mode for blink
+ * \brief   Checks whether enough time has been spent keeping LED off in CROSSWALK mode for blink
+ */
+bool enough_time_crosswalk_off(void);
 
 /**
  * \fn		void transition_state

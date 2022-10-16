@@ -29,6 +29,12 @@ volatile bool button_pressed = false;
 volatile bool transitioning = false;
 
 /**
+ * \var		volatile bool crosswalk_on
+ * \brief	Flag to indicate whether LED is actively on during CROSSWALK mode (since it should blink)
+ */
+volatile bool crosswalk_on = false;
+
+/**
  * \var		state_t current
  * \brief	The current state of the traffic light
  */
@@ -174,6 +180,32 @@ bool enough_time_transitioning(void)
      * Check if enough time has been spent transitioning to the current state (i.e. not stable)
      */
 	if((ticks_spent_transitioning * TICK_SEC) >= SEC_PER_TRANSITION){
+		return true;
+	}
+	else{
+		return false;
+	}
+}
+
+bool enough_time_crosswalk_on(void)
+{
+    /**
+     * Check if enough time has been spent keeping LED on in CROSSWALK mode for blink
+     */
+	if((ticks_spent_crosswalk_on * TICK_SEC * MSEC_PER_SEC) >= MSEC_PER_CROSSWALK_ON){
+		return true;
+	}
+	else{
+		return false;
+	}
+}
+
+bool enough_time_crosswalk_off(void)
+{
+    /**
+     * Check if enough time has been spent keeping LED off in CROSSWALK mode for blink
+     */
+	if((ticks_spent_crosswalk_off * TICK_SEC * MSEC_PER_SEC) >= MSEC_PER_CROSSWALK_OFF){
 		return true;
 	}
 	else{

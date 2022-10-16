@@ -72,6 +72,17 @@ void init_onboard_leds(void)
     BLUE_LED_OFF();
 }
 
+void clear_onboard_leds(void)
+{
+
+    /**
+     * Clear all on-board LEDs. Note that on-board LEDs are active-low
+     */
+	TPM2->CONTROLS[RED_LED_TPM2_CHANNEL].CnV = 0;
+	TPM2->CONTROLS[GREEN_LED_TPM2_CHANNEL].CnV = 0;
+	TPM0->CONTROLS[BLUE_LED_TPM0_CHANNEL].CnV = 0;
+}
+
 void set_onboard_leds(void)
 {
 

@@ -9,10 +9,10 @@
 #define SYSTICK_H_
 
 /**
- * \def		MS_PER_SEC
+ * \def		MSEC_PER_SEC
  * \brief	Used for unit conversions
  */
-#define MS_PER_SEC\
+#define MSEC_PER_SEC\
 	(1000)
 
 /**
@@ -83,6 +83,20 @@
 	(10)
 
 /**
+ * \def		MSEC_PER_CROSSWALK_ON
+ * \brief	The amount of time in msec LED should stay on per blink in CROSSWALK mode
+ */
+#define MSEC_PER_CROSSWALK_ON\
+	(750)
+
+/**
+ * \def		MSEC_PER_CROSSWALK_OFF
+ * \brief	The amount of time in msec LED should stay off per blink in CROSSWALK mode
+ */
+#define MSEC_PER_CROSSWALK_OFF\
+	(250)
+
+/**
  * \def		SEC_PER_TRANSITION
  * \brief	The amount of time in sec to be transitioning between states
  */
@@ -118,6 +132,20 @@
 	(10)
 
 /**
+ * \def		MSEC_PER_CROSSWALK_ON
+ * \brief	The amount of time in msec LED should stay on per blink in CROSSWALK mode
+ */
+#define MSEC_PER_CROSSWALK_ON\
+	(750)
+
+/**
+ * \def		MSEC_PER_CROSSWALK_OFF
+ * \brief	The amount of time in msec LED should stay off per blink in CROSSWALK mode
+ */
+#define MSEC_PER_CROSSWALK_OFF\
+	(250)
+
+/**
  * \def		SEC_PER_TRANSITION
  * \brief	The amount of time in sec to be transitioning between states
  */
@@ -149,6 +177,18 @@ extern volatile ticktime_t ticks_spent_stable;
  * \brief	Defined in systick.c
  */
 extern volatile ticktime_t ticks_spent_transitioning;
+
+/**
+ * \var		extern volatile ticktime_t ticks_spent_crosswalk_on
+ * \brief	Defined in systick.c
+ */
+extern volatile ticktime_t ticks_spent_crosswalk_on;
+
+/**
+ * \var		extern volatile ticktime_t ticks_spent_crosswalk_off
+ * \brief	Defined in systick.c
+ */
+extern volatile ticktime_t ticks_spent_crosswalk_off;
 
 /**
  * \var		extern volatile bool tick
